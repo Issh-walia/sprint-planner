@@ -911,8 +911,13 @@ function isHoliday(d) {
 }
 function isWorkday(d) { return !isWeekend(d); }
 function labelsOn(d) {
-  var iso = toISO(d), out=[];
-  for(var i=0;i<holidays.length;i++){if(holidays[i].date===iso)out.push(holidays[i].label);}
+  var iso = toISO(d), out=[], seen={};
+  for(var i=0;i<holidays.length;i++){
+    if(holidays[i].date===iso && !seen[holidays[i].label]){
+      seen[holidays[i].label]=true;
+      out.push(holidays[i].label);
+    }
+  }
   return out;
 }
 function addWorkdays(start, n) {
@@ -922,13 +927,14 @@ function addWorkdays(start, n) {
 }
 function nextWorkday(d) { var n=new Date(d); n.setDate(n.getDate()+1); while(!isWorkday(n))n.setDate(n.getDate()+1); return n; }
 function holidaysInRange(s,e) {
-  var out=[];
-  // Check each day in range for holiday matches (year-specific)
+  var out=[], seen={};
   var cur=new Date(s);
   while(cur<=e) {
     var iso=toISO(cur);
     for(var i=0;i<holidays.length;i++){
-      if(holidays[i].date===iso){
+      var key = iso+'|'+holidays[i].label;
+      if(holidays[i].date===iso && !seen[key]){
+        seen[key]=true;
         out.push({date:new Date(cur), label:holidays[i].label});
       }
     }
@@ -995,12 +1001,14 @@ function getReleaseHolidayAlerts(eu, na) {
     { date: getNearestMonday(eu,"before"), label: "Monday before EU release" },
     { date: getNearestMonday(na,"after"),  label: "Monday after NA release" }
   ];
+  var alertsSeen = {};
   for(var i=0; i<checkDates.length; i++) {
     var cd = checkDates[i];
     var cdISO = toISO(cd.date);
     for(var j=0; j<holidays.length; j++) {
-      // match by full date (year-specific)
-      if(holidays[j].date === cdISO) {
+      var key = cdISO+'|'+holidays[j].label+'|'+cd.label;
+      if(holidays[j].date === cdISO && !alertsSeen[key]) {
+        alertsSeen[key] = true;
         alerts.push({ when: cd.label, holiday: holidays[j].label, date: cd.date });
       }
     }
@@ -2652,10 +2660,15 @@ document.addEventListener("click", function(){
 // Always load holidays from Supabase first, fall back to localStorage
 dbLoadHolidays(function(data) {
   if(data && data.length > 0) {
-    holidays = data.map(function(h){ return { date: h.date, label: h.label }; });
-    saveHolidaysLocal(); // sync to localStorage
+    // Deduplicate by date+label
+    var seen = {}, deduped = [];
+    for(var i=0; i<data.length; i++){
+      var key = data[i].date+'|'+data[i].label;
+      if(!seen[key]){ seen[key]=true; deduped.push({ date: data[i].date, label: data[i].label }); }
+    }
+    holidays = deduped;
+    saveHolidaysLocal();
   } else {
-    // Fall back to localStorage if Supabase returns nothing
     var storedHols = loadHolidaysLocal();
     if(storedHols && storedHols.length > 0) holidays = storedHols;
   }
