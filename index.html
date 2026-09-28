@@ -2649,12 +2649,20 @@ document.addEventListener("click", function(){
   document.querySelectorAll(".save-dropdown-trigger.open").forEach(function(t){ t.classList.remove("open"); });
 });
 
-// Load holidays from localStorage if available, otherwise use HTML defaults
-var storedHols = loadHolidaysLocal();
-if(storedHols) holidays = storedHols;
-renderHolidays();
-calculate();
-initTabFromHash();
+// Always load holidays from Supabase first, fall back to localStorage
+dbLoadHolidays(function(data) {
+  if(data && data.length > 0) {
+    holidays = data.map(function(h){ return { date: h.date, label: h.label }; });
+    saveHolidaysLocal(); // sync to localStorage
+  } else {
+    // Fall back to localStorage if Supabase returns nothing
+    var storedHols = loadHolidaysLocal();
+    if(storedHols && storedHols.length > 0) holidays = storedHols;
+  }
+  renderHolidays();
+  calculate();
+  initTabFromHash();
+});
 </script>
 </body>
 </html>
