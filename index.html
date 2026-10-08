@@ -256,6 +256,8 @@
     .publish-btn:hover { background: var(--reg-ink); color: #fff; }
     .draft-badge { display: inline-flex; align-items: center; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; letter-spacing: 0.04em; }
     .published-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1px solid var(--reg-ink); border-radius: 6px; letter-spacing: 0.04em; }
+    .unpublish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .unpublish-btn:hover { background: #f59e0b; color: #fff; }
 
     /* ── Save dropdown on release cards ── */
     .save-dropdown-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
@@ -460,7 +462,7 @@
   <!-- Header -->
   <div class="header">
     <div>
-      <div class="header-eyebrow">Release planning</div>
+
       <div class="header-title">Sprint <span>Planner</span></div>
 
     </div>
@@ -629,13 +631,11 @@
   <div class="tab-panel" id="tab-releases">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Release dates</span>
-      <span class="history-count" id="releaseCount">0 releases</span>
     </div>
     <div class="release-filter-bar" id="releaseFilterBar">
-      <button class="release-filter-btn active" onclick="setReleaseFilter('all',this)">All</button>
-      <button class="release-filter-btn" onclick="setReleaseFilter('upcoming',this)">Upcoming</button>
-      <button class="release-filter-btn" onclick="setReleaseFilter('active',this)">Active</button>
-      <button class="release-filter-btn" onclick="setReleaseFilter('released',this)">Released</button>
+      <button class="release-filter-btn active" onclick="setReleaseFilter('upcoming',this)">Upcoming</button>
+      <button class="release-filter-btn" onclick="setReleaseFilter('past',this)">Past</button>
+      <button class="release-filter-btn" onclick="setReleaseFilter('all',this)">All</button>
     </div>
     <div class="history-card">
       <div id="releaseBody">
@@ -1554,27 +1554,46 @@ function renderHistory() {
 
       actions.appendChild(copySpBtn); actions.appendChild(copyImgSpBtn);
 
-      // Publish button or published badge (admin only)
+      // Publish / Unpublish buttons (admin only)
       if(isAdmin()) {
-        if(sp.published) {
+        if(status === "Past") {
+          // Past sprints — show badge only, no action buttons
           var pubBadge = document.createElement("span");
           pubBadge.className = "published-badge";
-          pubBadge.innerHTML = '&#10003; Published';
+          pubBadge.innerHTML = sp.published ? '&#10003; Published' : 'Draft';
+          if(!sp.published) { pubBadge.className = "draft-badge"; pubBadge.textContent = "Draft"; }
           actions.appendChild(pubBadge);
         } else {
-          var draftBadge = document.createElement("span");
-          draftBadge.className = "draft-badge";
-          draftBadge.textContent = "Draft";
-          var pubBtn = document.createElement("button");
-          pubBtn.className = "publish-btn";
-          pubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publish';
-          pubBtn.onclick = (function(sid, pb){ return function(e){
-            e.stopPropagation();
-            if(!confirm("Publish \"" + sp.name + "\" to Release Dates? This will make it visible to everyone.")) return;
-            publishSprint(sid, pb);
-          }; })(sp.id, pubBtn);
-          actions.appendChild(draftBadge);
-          actions.appendChild(pubBtn);
+          // Active and Upcoming — show full publish/unpublish controls
+          if(sp.published) {
+            var pubBadge2 = document.createElement("span");
+            pubBadge2.className = "published-badge";
+            pubBadge2.innerHTML = '&#10003; Published';
+            var unpubBtn = document.createElement("button");
+            unpubBtn.className = "unpublish-btn";
+            unpubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Unpublish';
+            unpubBtn.onclick = (function(sid, ub){ return function(e){
+              e.stopPropagation();
+              if(!confirm("Unpublish \"" + sp.name + "\"? It will be removed from Release Dates and only visible to admins.")) return;
+              unpublishSprint(sid, ub);
+            }; })(sp.id, unpubBtn);
+            actions.appendChild(pubBadge2);
+            actions.appendChild(unpubBtn);
+          } else {
+            var draftBadge = document.createElement("span");
+            draftBadge.className = "draft-badge";
+            draftBadge.textContent = "Draft";
+            var pubBtn = document.createElement("button");
+            pubBtn.className = "publish-btn";
+            pubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publish';
+            pubBtn.onclick = (function(sid, pb){ return function(e){
+              e.stopPropagation();
+              if(!confirm("Publish \"" + sp.name + "\" to Release Dates? This will make it visible to everyone.")) return;
+              publishSprint(sid, pb);
+            }; })(sp.id, pubBtn);
+            actions.appendChild(draftBadge);
+            actions.appendChild(pubBtn);
+          }
         }
       }
 
@@ -1778,14 +1797,12 @@ function renderReleases() {
   var grid=document.createElement("div"); grid.className="release-grid";
 
   // Group sprints by status
-  var groupActive=[], groupUpcoming=[], groupReleased=[];
+  var groupUpcoming=[], groupPast=[];
   var today0=new Date(); today0.setHours(0,0,0,0);
   sorted.forEach(function(sp){
     var eu=parseLocal(sp.euRelease);
-    var spStart=parseLocal(sp.sprintStart), spEnd=parseLocal(sp.sprintEnd);
-    if(eu < today0) groupReleased.push(sp);
-    else if(spStart<=today0 && today0<=spEnd) groupActive.push(sp);
-    else groupUpcoming.push(sp);
+    if(eu < today0) groupPast.push(sp);
+    else groupUpcoming.push(sp); // active + future both go into Upcoming
   });
 
   function makeDivider(label) {
@@ -1807,9 +1824,16 @@ function renderReleases() {
     group.forEach(function(sp){ buildCard(sp, grid); });
   }
 
-  appendGroup(groupActive, "Active", "active");
+  // If upcoming filter and no upcoming sprints, show a message
+  if(_releaseFilter === "upcoming" && groupUpcoming.length === 0) {
+    var emptyMsg = document.createElement("div");
+    emptyMsg.className = "history-empty";
+    emptyMsg.textContent = "No upcoming releases.";
+    grid.appendChild(emptyMsg);
+  }
+
   appendGroup(groupUpcoming, "Upcoming", "upcoming");
-  appendGroup(groupReleased, "Released", "released");
+  appendGroup(groupPast, "Past", "past");
 
   function buildCard(sp, grid) {
     (function(sp){
@@ -2047,6 +2071,22 @@ function deleteSprint(id) {
     showToast("Sprint deleted");
     renderHistory();
     if(window._currentTab === "releases") renderReleases();
+  });
+}
+
+function unpublishSprint(id, btn) {
+  if(btn) { btn.textContent = "Unpublishing..."; btn.disabled = true; }
+  sbFetch("sprints?id=eq." + id, {
+    method: "PATCH",
+    headers: sbHeaders(),
+    body: JSON.stringify({ published: false })
+  }).then(function(){
+    showToast("Sprint unpublished — moved back to Draft");
+    renderHistory();
+    renderReleases();
+  }).catch(function(){
+    showToast("Unpublish failed — try again");
+    if(btn) { btn.textContent = "Unpublish"; btn.disabled = false; }
   });
 }
 
@@ -2493,7 +2533,7 @@ function copyToClipboard(text, btn) {
   });
 }
 
-var _releaseFilter = "all";
+var _releaseFilter = "upcoming";
 function setReleaseFilter(filter, btn) {
   _releaseFilter = filter;
   var btns = document.querySelectorAll(".release-filter-btn");
