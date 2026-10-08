@@ -1556,12 +1556,16 @@ function renderHistory() {
 
       // Publish / Unpublish buttons (admin only)
       if(isAdmin()) {
-        if(status === "Past") {
+        if(status.label === "Past") {
           // Past sprints — show badge only, no action buttons
           var pubBadge = document.createElement("span");
-          pubBadge.className = "published-badge";
-          pubBadge.innerHTML = sp.published ? '&#10003; Published' : 'Draft';
-          if(!sp.published) { pubBadge.className = "draft-badge"; pubBadge.textContent = "Draft"; }
+          if(sp.published) {
+            pubBadge.className = "published-badge";
+            pubBadge.innerHTML = '&#10003; Published';
+          } else {
+            pubBadge.className = "draft-badge";
+            pubBadge.textContent = "Draft";
+          }
           actions.appendChild(pubBadge);
         } else {
           // Active and Upcoming — show full publish/unpublish controls
