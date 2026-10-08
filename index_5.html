@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sprint Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #0e0e0f; --ink2: #3a3a3c; --ink3: #7a7a80;
+      --paper: #f5f3ee; --card: #ffffff;
+      --border: rgba(14,14,15,0.10); --border-strong: rgba(14,14,15,0.18);
+      --sprint-bg: #eef0fb; --sprint-ink: #2d35a8;
+      --reg-bg: #eaf6f0; --reg-ink: #1a6644;
+      --release-bg: #fef4e4; --release-ink: #8a4f0a;
+      --block-bg: #fff1f1; --block-ink: #a32d2d; --block-border: #f09595;
+      --info-bg: #fff8e6; --info-ink: #8a5a00; --info-border: #f5cc6a;
+      --slack: #4A154B; --slack-hover: #611f64;
+      --mono: 'DM Mono', monospace; --display: 'Syne', sans-serif;
+    }
+    html, body { background: var(--paper); font-family: var(--display); color: var(--ink); min-height: 100vh; }
+    .wrap { max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── Header ── */
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; gap: 1rem; }
+    .header-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink3); text-transform: uppercase; margin-bottom: 6px; }
+    .header-title { font-size: 30px; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -0.03em; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .header-title span { color: var(--sprint-ink); }
+    .header-badge { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 11px; background: var(--sprint-bg); color: var(--sprint-ink); padding: 3px 10px; border-radius: 99px; }
+    .header-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; align-items: flex-end; flex-shrink: 0; }
+    .btn-slack { display: none; align-items: center; gap: 8px; background: var(--slack); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    .btn-slack:hover { background: var(--slack-hover); }
+    .btn-new-sprint { display: flex; align-items: center; gap: 7px; background: var(--sprint-ink); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .btn-inline { padding: 7px 12px !important; font-size: 12px !important; border-radius: 8px !important; width: 100%; justify-content: center; margin-bottom: 4px; }
+    .btn-new-sprint:hover { background: #1e2580; }
+    .btn-new-sprint:active { transform: scale(0.97); }
+    .btn-save { display: flex; align-items: center; gap: 7px; background: var(--card); color: var(--ink2); border: 1px solid var(--border-strong); border-radius: 10px; padding: 9px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .btn-save:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+
+    /* ── Tabs ── */
+    .tabs { display: none; gap: 0; margin-bottom: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
+    .tabs.admin-visible { display: flex; }
+    .tab { flex: 1; padding: 9px 12px; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink3); text-align: center; cursor: pointer; border-radius: 9px; transition: all 0.15s; letter-spacing: 0.03em; border: none; background: none; }
+    .tab:hover { color: var(--ink2); background: var(--paper); }
+    .tab.active { background: var(--sprint-bg); color: var(--sprint-ink); }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Blocker banner ── */
+    .blocker-banner { background: var(--block-bg); border: 1.5px solid var(--block-border); border-radius: 12px; padding: 14px 16px; margin-bottom: 1.5rem; display: none; }
+    .blocker-banner.visible { display: block; }
+    .blocker-banner-title { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--block-ink); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .blocker-list { display: flex; flex-direction: column; gap: 6px; }
+    .blocker-item { background: #fff; border: 1px solid var(--block-border); border-radius: 8px; padding: 10px 14px; display: flex; gap: 10px; }
+    .blocker-item-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--block-ink); margin-top: 4px; flex-shrink: 0; }
+    .blocker-item-milestone { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--block-ink); }
+    .blocker-item-detail { font-family: var(--mono); font-size: 11px; color: #c0392b; margin-top: 2px; }
+
+    /* ── Config card ── */
+    /* Sprint action bar */
+    .sprint-action-bar { display: none; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; margin-bottom: 12px; gap: 16px; }
+    .sprint-action-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .sprint-action-icon { width: 36px; height: 36px; background: var(--sprint-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--sprint-ink); flex-shrink: 0; }
+    .sprint-action-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .sprint-action-title { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+    .sprint-action-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .sprint-action-btns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .sab-btn { display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 9px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; white-space: nowrap; }
+    .sab-icon { display: flex; align-items: center; justify-content: center; }
+    .sab-new { background: var(--sprint-ink); color: #fff; }
+    .sab-new:hover { background: #1e2580; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,53,168,0.25); }
+    .sab-save { background: var(--paper); color: var(--ink2); border: 1px solid var(--border-strong) !important; }
+    .sab-save:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink) !important; }
+    .sab-btn:active { transform: scale(0.97) translateY(0); box-shadow: none; }
+
+    .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .card-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--ink3); text-transform: uppercase; margin-bottom: 1rem; }
+    .config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 12px; font-family: var(--mono); color: var(--ink3); }
+    .field input { background: var(--paper); border: 1px solid var(--border-strong); border-radius: 8px; padding: 9px 12px; font-family: var(--mono); font-size: 14px; color: var(--ink); outline: none; width: 100%; transition: border-color 0.15s; }
+    .field input:focus { border-color: var(--sprint-ink); box-shadow: 0 0 0 3px rgba(45,53,168,0.10); }
+    .field-note { font-family: var(--mono); font-size: 10px; color: var(--ink3); }
+
+    /* ── Timeline bar ── */
+    .timeline-bar { display: flex; height: 6px; border-radius: 99px; overflow: hidden; margin: 0 0 1.5rem; gap: 2px; }
+    .tbar-sprint { background: var(--sprint-ink); opacity: 0.7; border-radius: 99px 0 0 99px; flex: 22; }
+    .tbar-reg { background: var(--reg-ink); opacity: 0.7; flex: 13; }
+    .tbar-release { background: var(--release-ink); opacity: 0.7; width: 6px; flex-shrink: 0; border-radius: 0 99px 99px 0; }
+
+    /* ── Phase blocks ── */
+    .phases { display: flex; flex-direction: column; gap: 1rem; }
+    .phase-block { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); transition: border-color 0.2s; }
+    .phase-block.has-blocker { border-color: var(--block-border); }
+    .phase-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; }
+    .phase-sprint .phase-header { background: var(--sprint-bg); color: var(--sprint-ink); }
+    .phase-sprint .dot { background: var(--sprint-ink); }
+    .phase-reg .phase-header { background: var(--reg-bg); color: var(--reg-ink); }
+    .phase-reg .dot { background: var(--reg-ink); }
+    .phase-release .phase-header { background: var(--release-bg); color: var(--release-ink); }
+    .phase-release .dot { background: var(--release-ink); }
+    .blocker-count { margin-left: auto; background: var(--block-ink); color: #fff; font-size: 10px; padding: 1px 7px; border-radius: 99px; display: none; }
+    .blocker-count.visible { display: inline-block; }
+    .phase-body { background: var(--card); }
+    .window-holidays { padding: 10px 16px; background: var(--info-bg); border-top: 1px solid var(--info-border); display: none; flex-direction: column; gap: 4px; }
+    .window-holidays.visible { display: flex; }
+    .wh-title { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--info-ink); text-transform: uppercase; margin-bottom: 4px; }
+    .wh-row { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--info-ink); }
+    .wh-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--info-ink); flex-shrink: 0; }
+    .milestone-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .milestone-row:last-child { border-bottom: none; }
+    .milestone-name { font-size: 13px; color: var(--ink2); font-family: var(--mono); }
+    .milestone-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .milestone-date { font-size: 15px; font-weight: 700; color: var(--ink); font-family: var(--display); }
+    .milestone-date.blocked-date { color: var(--block-ink); }
+    .milestone-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .blocker-pill { display: flex; align-items: center; gap: 5px; background: var(--block-bg); border: 1px solid var(--block-border); color: var(--block-ink); font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 99px; }
+    .blocker-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--block-ink); }
+
+    /* ── Sprint Schedule tab ── */
+    .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .history-heading { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+    .history-count { font-family: var(--mono); font-size: 11px; background: var(--paper); color: var(--ink3); padding: 3px 10px; border-radius: 99px; border: 1px solid var(--border-strong); }
+    .history-card { background: transparent; border: none; border-radius: 0; overflow: visible; }
+    .history-empty { padding: 3rem 1.5rem; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--ink3); line-height: 1.8; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
+    .schedule-grid { display: flex; flex-direction: column; gap: 10px; }
+    .sprint-entry { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s, border-color 0.15s; }
+    .sprint-entry:hover { box-shadow: 0 2px 14px rgba(14,14,15,0.07); }
+    .sprint-entry.active-entry { border-color: var(--sprint-ink); }
+    .sprint-entry.expanded { box-shadow: 0 3px 18px rgba(14,14,15,0.10); }
+    .entry-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; gap: 10px; cursor: pointer; }
+    .entry-top-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+    .entry-chevron { width: 24px; height: 24px; border-radius: 50%; background: var(--paper); border: 1px solid var(--border-strong); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: var(--ink3); transition: transform 0.2s, background 0.15s; }
+    .sprint-entry.expanded .entry-chevron { transform: rotate(180deg); background: var(--sprint-bg); border-color: var(--sprint-ink); color: var(--sprint-ink); }
+    .entry-info { min-width: 0; flex: 1; }
+    .entry-name { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sprint-entry.active-entry .entry-name { color: var(--sprint-ink); }
+    .entry-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .entry-dates { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .entry-status { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 99px; }
+    .status-past { background: #e6f9f0; color: #1a6644; }
+    .status-active { background: var(--sprint-bg); color: var(--sprint-ink); }
+    .status-upcoming { background: #fff1f1; color: #a32d2d; }
+    .entry-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .entry-edit-btn { display: none; align-items: center; gap: 5px; background: none; border: 1px solid var(--border-strong); border-radius: 7px; padding: 6px 10px; font-family: var(--mono); font-size: 11px; color: var(--ink2); cursor: pointer; transition: all 0.15s; }
+    .entry-edit-btn.visible { display: inline-flex; }
+    .entry-edit-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .entry-send-btn { display: none; align-items: center; gap: 5px; background: var(--slack); color: #fff; border: none; border-radius: 7px; padding: 6px 11px; font-family: var(--mono); font-size: 11px; cursor: pointer; transition: background 0.15s; }
+    .entry-send-btn:hover { background: var(--slack-hover); }
+    .entry-del-btn { background: none; border: 1px solid var(--border); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+    .entry-del-btn:hover { background: #fff0f0; border-color: #f09595; color: #c0392b; }
+    .entry-dates-panel { display: none; border-top: 1px solid var(--border); }
+    .sprint-entry.expanded .entry-dates-panel { display: block; }
+    .dp-sections { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .dp-section { padding: 14px 16px; }
+    .dp-section:not(:last-child) { border-right: 1px solid var(--border); }
+    .dp-section-label { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid; }
+    .dp-section.sec-sprint { background: #f8f9fe; }
+    .dp-section.sec-sprint .dp-section-label { color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .dp-section.sec-reg { background: #f4fbf7; }
+    .dp-section.sec-reg .dp-section-label { color: var(--reg-ink); border-color: var(--reg-ink); }
+    .dp-section.sec-release { background: #fef9f0; }
+    .dp-section.sec-release .dp-section-label { color: var(--release-ink); border-color: var(--release-ink); }
+    .dp-row { margin-bottom: 10px; }
+    .dp-row:last-child { margin-bottom: 0; }
+    .dp-lbl { font-family: var(--mono); font-size: 9px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+    .dp-val { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink); line-height: 1.4; }
+    .entry-radio-zone { display: none; }
+
+
+    /* ── Release Dates tab ── */
+    /* ── Release filter bar ── */
+    .release-filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .release-filter-btn { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--card); color: var(--ink3); cursor: pointer; transition: all 0.15s; }
+    .release-filter-btn:hover { background: var(--paper); color: var(--ink2); }
+    .release-filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .release-grid { display: flex; flex-direction: column; gap: 10px; }
+    /* Info button */
+    .info-btn { width: 22px; height: 22px; border-radius: 50%; background: var(--paper); border: 1px solid var(--border-strong); font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--ink3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .info-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .info-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.45); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .info-modal-overlay.open { display: flex; }
+    .info-modal { background: var(--card); border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 420px; overflow: hidden; animation: popIn 0.18s ease; }
+    .info-modal-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .info-modal-title { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+    .info-modal-close { background: none; border: 1px solid var(--border-strong); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .info-modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .info-item { display: flex; align-items: flex-start; gap: 12px; }
+    .info-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .info-item-body {}
+    .info-item-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .info-item-desc { font-family: var(--mono); font-size: 11px; color: var(--ink3); line-height: 1.6; }
+    .release-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: visible; transition: box-shadow 0.15s; }
+    .release-card-header { border-radius: 14px 14px 0 0; overflow: hidden; }
+    .release-card-footer { border-radius: 0 0 14px 14px; }
+    .release-card:hover { box-shadow: 0 2px 12px rgba(14,14,15,0.07); }
+    .release-card-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px 11px; border-bottom: 1px solid var(--border); }
+    .release-card-name { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: 0.01em; }
+    .release-card-status { font-family: var(--mono); font-size: 10px; padding: 3px 10px; border-radius: 99px; }
+    .release-card-body { display: grid; grid-template-columns: 1fr 1fr; }
+    .release-slot { padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+    .release-slot:first-child { border-right: 1px solid var(--border); }
+    .release-slot-flag { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+    .release-slot-flag-icon { font-size: 15px; line-height: 1; }
+    .release-slot-region { font-family: var(--mono); font-size: 10px; color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; }
+    .release-slot-weekday { font-family: var(--mono); font-size: 10px; color: var(--ink3); }
+    .release-slot-date { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--ink); line-height: 1.3; letter-spacing: -0.01em; }
+    .release-slot.eu { background: #f8f9fe; }
+    .release-slot.eu .release-slot-date { color: var(--sprint-ink); }
+    .release-slot.na { background: #f4fbf7; }
+    .release-slot.na .release-slot-date { color: var(--reg-ink); }
+    .release-card-footer { display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding: 9px 14px; border-top: 1px solid var(--border); background: #fafafa; overflow: visible; position: relative; }
+    /* Holiday tooltip on release card */
+    .release-hol-tip { position: relative; display: inline-flex; align-items: center; margin: 0 2px; }
+    .release-hol-icon { width: 26px; height: 26px; border-radius: 50%; background: #fff8e6; border: 1.5px solid #f5cc6a; color: #8a5a00; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .release-hol-tip:hover .release-hol-tipbox,
+    .release-hol-tip:focus .release-hol-tipbox { display: block; }
+    .release-hol-tipbox { display: none; position: absolute; bottom: 36px; right: 0; background: #1a1a1a; color: #fff; border-radius: 10px; padding: 10px 14px; min-width: 260px; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.35); pointer-events: none; }
+    .release-hol-tipbox::after { content: ""; position: absolute; bottom: -6px; right: 9px; width: 12px; height: 12px; background: #1a1a1a; transform: rotate(45deg); border-radius: 2px; }
+    .release-hol-tipbox-title { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #f5cc6a; margin-bottom: 8px; font-weight: 600; }
+    .release-hol-tipbox-row { font-family: var(--mono); font-size: 11px; color: #e2e8f0; margin-bottom: 5px; line-height: 1.5; }
+    .release-hol-tipbox-row:last-child { margin-bottom: 0; }
+    /* Save as image button */
+    .release-save-img-btn { background: none; border: 1px solid var(--border-strong); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+    .release-save-img-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    /* Pencil edit button next to sprint name */
+    .entry-name-edit-btn { display: none; align-items: center; justify-content: center; background: none; border: 1px solid var(--border-strong); border-radius: 5px; width: 18px; height: 18px; cursor: pointer; color: var(--ink3); margin-left: 6px; flex-shrink: 0; transition: all 0.12s; vertical-align: middle; }
+    .entry-name-edit-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .release-send-btn { display: none; align-items: center; gap: 6px; background: var(--slack); color: #fff; border: none; border-radius: 7px; padding: 6px 12px; font-family: var(--mono); font-size: 11px; cursor: pointer; transition: background 0.15s; }
+    .release-send-btn:hover { background: var(--slack-hover); }
+    .release-days-away { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .release-alert-strip { background: #fff8e6; border-top: 1px solid #f5cc6a; border-bottom: 1px solid #f5cc6a; padding: 10px 16px; display: flex; flex-direction: column; gap: 5px; }
+    .release-alert-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: #8a5a00; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+    .release-alert-row { display: flex; align-items: flex-start; gap: 7px; font-family: var(--mono); font-size: 11px; color: #8a5a00; line-height: 1.5; }
+    .release-alert-dot { width: 5px; height: 5px; border-radius: 50%; background: #f5a623; flex-shrink: 0; margin-top: 4px; }
+    #releaseAlertZone { background: #fff3cd; border: 1.5px solid #f5a623; border-radius: 10px; margin: 10px 16px 4px 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+    .planner-release-blocker-title { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--block-ink); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+    .planner-release-blocker-row { display: flex; align-items: flex-start; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--block-ink); line-height: 1.6; margin-bottom: 2px; }
+    .planner-blocker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--block-ink); flex-shrink: 0; margin-top: 5px; }
+    .planner-blocker-context { color: #c0392b; font-size: 11px; }
+    .planner-alert-spacer { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.08); }
+    .planner-release-alert-title { font-family: var(--mono); font-size: 11px; font-weight: 600; color: #7a4800; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+    .planner-release-alert-row { display: flex; align-items: flex-start; gap: 8px; font-family: var(--mono); font-size: 12px; color: #7a4800; line-height: 1.6; }
+    .planner-alert-dot { width: 6px; height: 6px; border-radius: 50%; background: #f5a623; flex-shrink: 0; margin-top: 5px; }
+
+    /* ── Publish button & draft badge ── */
+    .publish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1.5px solid var(--reg-ink); border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .publish-btn:hover { background: var(--reg-ink); color: #fff; }
+    .draft-badge { display: inline-flex; align-items: center; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; letter-spacing: 0.04em; }
+    .published-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1px solid var(--reg-ink); border-radius: 6px; letter-spacing: 0.04em; }
+
+    /* ── Save dropdown on release cards ── */
+    .save-dropdown-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+    .save-dropdown-trigger { background: none; border: 1px solid var(--border-strong); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+    .save-dropdown-trigger:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .save-dropdown-trigger.open { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .save-dropdown-menu { display: none; position: absolute; bottom: 36px; right: 0; background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 4px 20px rgba(14,14,15,0.13); min-width: 150px; z-index: 200; overflow: hidden; }
+    .save-dropdown-menu.open { display: block; }
+    .save-dropdown-item { display: flex; align-items: center; gap: 9px; padding: 10px 14px; font-family: var(--mono); font-size: 12px; color: var(--ink2); cursor: pointer; transition: background 0.1s; border: none; background: none; width: 100%; text-align: left; }
+    .save-dropdown-item:hover { background: var(--sprint-bg); color: var(--sprint-ink); }
+    .save-dropdown-item + .save-dropdown-item { border-top: 1px solid var(--border); }
+
+    /* ── Sprint Details Modal ── */
+    .sprint-detail-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.45); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .sprint-detail-modal-overlay.open { display: flex; }
+    .sprint-detail-modal { background: var(--card); border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 440px; overflow: hidden; animation: popIn 0.18s ease; }
+    .sprint-detail-modal-header { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .sprint-detail-modal-title { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+    .sprint-detail-modal-close { background: none; border: 1px solid var(--border-strong); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .sprint-detail-modal-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 0; }
+    .sdm-section { margin-bottom: 14px; }
+    .sdm-section-label { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding-bottom: 6px; border-bottom: 2px solid; margin-bottom: 10px; }
+    .sdm-section.sdm-sprint .sdm-section-label { color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .sdm-section.sdm-reg .sdm-section-label { color: var(--reg-ink); border-color: var(--reg-ink); }
+    .sdm-section.sdm-release .sdm-section-label { color: var(--release-ink); border-color: var(--release-ink); }
+    .sdm-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .sdm-row:last-child { border-bottom: none; }
+    .sdm-lbl { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .sdm-val { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+    .sdm-meta { font-family: var(--mono); font-size: 10px; color: var(--ink3); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .release-detail-btn { width: 22px; height: 22px; border-radius: 50%; background: var(--sprint-bg); border: 1px solid var(--sprint-ink); font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--sprint-ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; margin-left: 6px; }
+    .release-detail-btn:hover { background: var(--sprint-ink); color: #fff; }
+
+    /* ── Schedule holiday strip ── */
+    .sched-hol-strip { border-top: 1px solid var(--info-border); background: var(--info-bg); padding: 12px 16px; }
+    .sched-hol-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--info-ink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .sched-hol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .sched-hol-group { display: flex; flex-direction: column; gap: 5px; }
+    .sched-hol-group-label { font-family: var(--mono); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; padding-bottom: 4px; border-bottom: 1.5px solid currentColor; opacity: 0.7; }
+    .col-sprint { color: var(--sprint-ink); }
+    .col-reg { color: var(--reg-ink); }
+    .col-release { color: var(--release-ink); }
+    .sched-hol-row { display: flex; align-items: flex-start; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--info-ink); line-height: 1.5; }
+    .sched-hol-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--info-ink); flex-shrink: 0; margin-top: 4px; }
+    .sched-hol-when { color: var(--ink3); font-size: 10px; }
+
+    /* ── Holiday tab ── */
+    /* ── Add holiday year picker ── */
+    .year-picker-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.45); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .year-picker-overlay.open { display: flex; }
+    .year-picker-modal { background: var(--card); border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 320px; overflow: hidden; animation: popIn 0.18s ease; }
+    .year-picker-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .year-picker-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .year-picker-close { background: none; border: 1px solid var(--border-strong); border-radius: 8px; width: 26px; height: 26px; cursor: pointer; color: var(--ink3); font-size: 15px; display: flex; align-items: center; justify-content: center; }
+    .year-picker-body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .year-picker-sub { font-size: 11px; color: var(--ink3); margin-bottom: 4px; }
+    .year-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .year-picker-btn { padding: 12px; font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--ink2); background: var(--paper); border: 1px solid var(--border-strong); border-radius: 10px; cursor: pointer; transition: all 0.12s; text-align: center; }
+    .year-picker-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+
+    .holiday-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .holiday-heading { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+    .btn-add-holiday { background: none; border: 1px dashed var(--border-strong); border-radius: 8px; padding: 8px 16px; font-family: var(--mono); font-size: 12px; color: var(--ink3); cursor: pointer; transition: all 0.12s; }
+    .btn-add-holiday:hover { background: var(--paper); color: var(--ink2); }
+    .holiday-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; }
+    .holiday-year-group { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+    .holiday-year-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--paper); cursor: pointer; user-select: none; }
+    .holiday-year-label { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); }
+    .holiday-year-count { font-family: var(--mono); font-size: 10px; color: var(--ink3); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; }
+    .holiday-year-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.2s; display: inline-block; }
+    .holiday-year-chevron.open { transform: rotate(180deg); }
+    .holiday-year-body { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--card); }
+    .holiday-year-body.collapsed { display: none; }
+
+    .holiday-list { display: flex; flex-direction: column; gap: 8px; }
+    .holiday-empty { font-family: var(--mono); font-size: 12px; color: var(--ink3); text-align: center; padding: 2rem; }
+    .holiday-row { display: flex; align-items: center; gap: 8px; }
+    .holiday-row input { background: var(--paper); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 10px; font-family: var(--mono); font-size: 12px; color: var(--ink); outline: none; }
+    .holiday-row input[type="date"] { flex: 1; }
+    .holiday-row input[type="text"] { flex: 2; }
+    .del-btn { background: none; border: 1px solid var(--border); border-radius: 7px; width: 32px; height: 32px; cursor: pointer; color: var(--ink3); font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+    .del-btn:hover { background: #fff0f0; border-color: #ffaaaa; color: #c0392b; }
+
+    /* ── Modals ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.5); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border-radius: 18px; border: 1px solid var(--border); width: 100%; max-width: 480px; overflow: hidden; animation: popIn 0.18s ease; }
+    @keyframes popIn { from { opacity:0; transform:scale(0.96) translateY(6px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .modal-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px; }
+    .modal-close { background: none; border: 1px solid var(--border-strong); border-radius: 8px; width: 30px; height: 30px; cursor: pointer; color: var(--ink3); font-size: 18px; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { background: var(--paper); }
+    .modal-body { padding: 20px 22px; }
+    .modal-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--ink3); text-transform: uppercase; margin-bottom: 8px; }
+    .summary-grid { background: var(--paper); border: 1px solid var(--border-strong); border-radius: 10px; padding: 14px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 16px; }
+    .summary-lbl { font-family: var(--mono); font-size: 10px; color: var(--ink3); margin-bottom: 2px; }
+    .summary-val { font-family: var(--display); font-size: 13px; font-weight: 700; color: var(--ink); }
+    .text-input { background: var(--paper); border: 1px solid var(--border-strong); border-radius: 8px; padding: 9px 12px; font-family: var(--mono); font-size: 13px; color: var(--ink); outline: none; width: 100%; }
+    .text-input:focus { border-color: var(--sprint-ink); }
+    .text-input.error { border-color: var(--block-ink); }
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .team-chip { border: 1.5px solid var(--border-strong); border-radius: 10px; padding: 12px 8px 10px; cursor: pointer; text-align: center; transition: all 0.15s; background: var(--paper); }
+    .team-chip:hover, .team-chip.selected { border-color: var(--slack); background: #f8f0f8; }
+    .team-chip-icon { font-size: 22px; display: block; margin-bottom: 5px; }
+    .team-chip-name { font-family: var(--mono); font-size: 11px; color: var(--ink2); }
+    .team-chip.selected .team-chip-name { color: var(--slack); }
+    .saved-badge { font-family: var(--mono); font-size: 10px; background: var(--reg-bg); color: var(--reg-ink); padding: 3px 8px; border-radius: 99px; display: none; }
+    .saved-badge.visible { display: inline-block; }
+    .preview-box { background: var(--paper); border: 1px solid var(--border-strong); border-radius: 10px; padding: 14px 16px; font-family: var(--mono); font-size: 11px; line-height: 1.9; color: var(--ink2); white-space: pre-wrap; display: none; max-height: 180px; overflow-y: auto; margin-bottom: 16px; }
+    .preview-box.visible { display: block; }
+    .err-msg { font-family: var(--mono); font-size: 11px; color: var(--block-ink); margin-top: 6px; display: none; }
+    .err-msg.visible { display: block; }
+    .modal-footer { display: flex; gap: 8px; margin-top: 16px; }
+    .btn-cancel { flex: 1; background: none; border: 1px solid var(--border-strong); border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 13px; color: var(--ink3); cursor: pointer; }
+    .btn-cancel:hover { background: var(--paper); }
+    .btn-primary { flex: 2; background: var(--sprint-ink); border: none; border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; }
+    .btn-primary:hover { background: #1e2580; }
+    .btn-send-slack { display: none; flex: 2; background: var(--slack); border: none; border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; opacity: 0.4; pointer-events: none; }
+    .btn-send-slack.active { opacity: 1; pointer-events: all; }
+    .btn-send-slack.active:hover { background: var(--slack-hover); }
+
+    /* ── Toast ── */
+    /* ── Lock / Admin mode ── */
+    .lock-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 14px; font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--ink3); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .lock-btn:hover { background: var(--paper); color: var(--ink2); }
+    .lock-btn.unlocked { background: var(--reg-bg); color: var(--reg-ink); border-color: var(--reg-ink); }
+    .lock-btn svg { width: 14px; height: 14px; }
+    .pin-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.5); align-items: center; justify-content: center; z-index: 2000; }
+    .pin-modal-overlay.open { display: flex; }
+    .pin-modal { background: var(--card); border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 340px; padding: 28px 28px 24px; text-align: center; }
+    .pin-modal-icon { font-size: 32px; margin-bottom: 12px; }
+    .pin-modal-title { font-size: 17px; font-weight: 800; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.02em; }
+    .pin-modal-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); margin-bottom: 20px; }
+    .pin-input { width: 100%; background: var(--paper); border: 1px solid var(--border-strong); border-radius: 10px; padding: 12px 16px; font-family: var(--mono); font-size: 18px; color: var(--ink); outline: none; text-align: center; letter-spacing: 0.15em; margin-bottom: 8px; }
+    .pin-input:focus { border-color: var(--sprint-ink); box-shadow: 0 0 0 3px rgba(45,53,168,0.10); }
+    .pin-input.error { border-color: var(--block-ink); animation: shake 0.3s ease; }
+    .pin-error-msg { font-family: var(--mono); font-size: 11px; color: var(--block-ink); margin-bottom: 12px; min-height: 16px; }
+    .pin-submit-btn { width: 100%; background: var(--sprint-ink); color: #fff; border: none; border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; margin-bottom: 8px; }
+    .pin-submit-btn:hover { background: #1e2580; }
+    .pin-cancel-btn { width: 100%; background: none; border: none; font-family: var(--mono); font-size: 12px; color: var(--ink3); cursor: pointer; padding: 6px; }
+    .pin-cancel-btn:hover { color: var(--ink2); }
+    .readonly-badge { display: none; font-family: var(--mono); font-size: 10px; background: #f1f0ee; color: var(--ink3); padding: 2px 8px; border-radius: 99px; margin-left: 8px; }
+    .readonly-badge.visible { display: inline-block; }
+
+    /* ── Cascade modal ── */
+    .cascade-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.5); align-items: center; justify-content: center; z-index: 1500; padding: 1rem; }
+    .cascade-modal-overlay.open { display: flex; }
+    .cascade-modal { background: var(--card); border-radius: 18px; border: 1px solid var(--border); width: 100%; max-width: 520px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; animation: popIn 0.18s ease; }
+    .cascade-modal-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .cascade-modal-title { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 4px; }
+    .cascade-modal-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+    .cascade-modal-body { padding: 16px 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .cascade-sprint-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .cascade-sprint-name { padding: 10px 14px; background: var(--sprint-bg); font-size: 13px; font-weight: 700; color: var(--sprint-ink); font-family: var(--mono); }
+    .cascade-changes { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--card); }
+    .cascade-change-row { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; }
+    .cascade-change-label { color: var(--ink3); width: 110px; flex-shrink: 0; }
+    .cascade-old { color: var(--block-ink); text-decoration: line-through; }
+    .cascade-arrow { color: var(--ink3); }
+    .cascade-new { color: var(--reg-ink); font-weight: 600; }
+    .cascade-modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; background: var(--card); }
+    .cascade-cancel-btn { flex: 1; background: none; border: 1px solid var(--border-strong); border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 13px; color: var(--ink3); cursor: pointer; }
+    .cascade-cancel-btn:hover { background: var(--paper); }
+    .cascade-skip-btn { flex: 1.5; background: none; border: 1px solid var(--border-strong); border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--ink2); cursor: pointer; transition: all 0.15s; }
+    .cascade-skip-btn:hover { background: var(--paper); color: var(--ink); }
+    .cascade-confirm-btn { flex: 2; background: var(--sprint-ink); border: none; border-radius: 10px; padding: 11px; font-family: var(--display); font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .cascade-confirm-btn:hover { background: #1e2580; }
+
+    .planner-mode-toggle { display: flex; background: var(--paper); border: 1px solid var(--border-strong); border-radius: 10px; padding: 3px; gap: 2px; margin-bottom: 14px; width: fit-content; }
+    .pmt-btn { font-size: 13px; font-weight: 600; font-family: var(--display); padding: 8px 18px; border-radius: 7px; cursor: pointer; color: var(--ink3); border: none; background: none; transition: all 0.15s; }
+    .pmt-btn.active-release { background: var(--sprint-ink); color: #fff; }
+    .pmt-btn.active-sprint { background: var(--reg-ink); color: #fff; }
+    .sprint-only-note { background: var(--reg-bg); border: 1px solid var(--reg-ink); border-radius: 10px; padding: 10px 14px; font-family: var(--mono); font-size: 12px; color: var(--reg-ink); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    /* ── Drag & drop ── */
+    .drag-handle { display: flex; align-items: center; justify-content: center; width: 24px; height: 36px; cursor: grab; color: var(--ink3); flex-shrink: 0; border-radius: 6px; transition: background 0.12s; user-select: none; }
+    .drag-handle:hover { background: var(--paper); color: var(--ink2); }
+    .drag-handle:active { cursor: grabbing; }
+    .drag-handle svg { pointer-events: none; }
+    .sprint-entry.dragging { opacity: 0.4; border: 2px dashed var(--sprint-ink); }
+    .sprint-entry.drag-over { border-color: var(--sprint-ink); background: var(--sprint-bg); transform: scale(1.01); box-shadow: 0 4px 20px rgba(45,53,168,0.15); }
+    .sprint-entry { transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+
+    .copy-btn { background: none; border: 1px solid var(--border-strong); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; color: var(--ink3); display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+    .copy-btn:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .copy-btn.copied { background: var(--reg-bg); color: var(--reg-ink); border-color: var(--reg-ink); }
+
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a1a; color: #fff; font-family: var(--mono); font-size: 12px; padding: 11px 20px; border-radius: 99px; display: flex; align-items: center; gap: 8px; transition: transform 0.3s ease; z-index: 2000; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; }
+
+    @media (max-width: 520px) {
+      .config-row { grid-template-columns: 1fr; }
+      .header-title { font-size: 22px; }
+      .team-grid { grid-template-columns: repeat(2,1fr); }
+      .entry-actions { gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+
+      <div class="header-title">Sprint <span>Planner</span></div>
+
+    </div>
+    <div class="header-actions">
+      <button class="lock-btn" id="lockBtn" onclick="openPinModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="lockBtnText">Admin</span>
+      </button>
+      <button class="btn-slack" onclick="openSlackModal(null)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+        Share to Slack
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab" onclick="switchTab('releases')">Release dates</button>
+    <button class="tab" onclick="switchTab('planner')">Planner</button>
+    <button class="tab" onclick="switchTab('history')">Sprint schedule</button>
+    <button class="tab" onclick="switchTab('holidays')">Holidays</button>
+  </div>
+
+  <!-- ── TAB: Planner ── -->
+  <div class="tab-panel active" id="tab-planner">
+    <div class="blocker-banner" id="blockerBanner">
+      <div class="blocker-banner-title">🚫 Holiday blockers detected</div>
+      <div class="blocker-list" id="blockerList"></div>
+    </div>
+
+    <!-- Sprint action bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div class="planner-mode-toggle" style="margin-bottom:0;">
+        <button class="pmt-btn active-release" id="modeRelease" onclick="setPlannerMode('release')">Create release</button>
+        <button class="pmt-btn" id="modeSprint" onclick="setPlannerMode('sprint')">Create sprint</button>
+      </div>
+      <button class="sab-btn sab-save" onclick="openSaveModal()" style="display:none;" id="saveSprint­Btn">
+        <span class="sab-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </span>
+        <span class="sab-label">Save sprint</span>
+      </button>
+    </div>
+    <div class="config-card">
+      <div class="card-label">Configuration</div>
+      <div class="config-row">
+        <div class="field">
+          <label>Sprint start date</label>
+          <input type="date" id="sprintStart" oninput="calculate()" />
+          <span class="field-note">Weekends auto-advance to Monday</span>
+        </div>
+        <div class="field">
+          <label>Sprint duration (working days)</label>
+          <select id="sprintDays" onchange="onSprintDaysChange()" style="background:var(--paper);border:1px solid var(--border-strong);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;cursor:pointer;">
+            <option value="12">12 days</option>
+            <option value="19">19 days</option>
+            <option value="22">22 days</option>
+            <option value="25">25 days</option>
+            <option value="28">28 days</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="number" id="sprintDaysCustom" value="19" min="1" max="90" oninput="calculate()" placeholder="Custom days" style="display:none;margin-top:6px;background:var(--paper);border:1px solid var(--sprint-ink);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;box-sizing:border-box;" />
+        </div>
+        <div class="field">
+          <label>Feature freeze (working day #)</label>
+          <select id="freezeDay" onchange="onFreezeDayChange()" style="background:var(--paper);border:1px solid var(--border-strong);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;cursor:pointer;">
+            <option value="8">Day 8</option>
+            <option value="12">Day 12</option>
+            <option value="14">Day 14</option>
+            <option value="16">Day 16</option>
+            <option value="18">Day 18</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="number" id="freezeDayCustom" value="12" min="1" max="90" oninput="calculate()" placeholder="Custom day #" style="display:none;margin-top:6px;background:var(--paper);border:1px solid var(--sprint-ink);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;box-sizing:border-box;" />
+        </div>
+        <div class="field" id="regDaysField">
+          <label>Regression duration (working days)</label>
+          <select id="regDays" onchange="onRegDaysChange()" style="background:var(--paper);border:1px solid var(--border-strong);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;cursor:pointer;">
+            <option value="8">8 days</option>
+            <option value="11">11 days</option>
+            <option value="13">13 days</option>
+            <option value="15">15 days</option>
+            <option value="17">17 days</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="number" id="regDaysCustom" value="11" min="1" max="90" oninput="calculate()" placeholder="Custom days" style="display:none;margin-top:6px;background:var(--paper);border:1px solid var(--sprint-ink);border-radius:8px;padding:9px 12px;font-family:var(--mono);font-size:14px;color:var(--ink);outline:none;width:100%;box-sizing:border-box;" />
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-bar">
+      <div class="tbar-sprint" id="tbarSprint"></div>
+      <div class="tbar-reg" id="tbarReg"></div>
+      <div class="tbar-release"></div>
+    </div>
+
+    <div class="phases">
+      <div class="phase-block phase-sprint" id="blockSprint">
+        <div class="phase-header"><span class="dot"></span> Sprint <span class="blocker-count" id="bcSprint"></span></div>
+        <div class="phase-body">
+          <div class="milestone-row" id="rowSprintStart">
+            <span class="milestone-name">Start</span>
+            <div class="milestone-right"><span class="milestone-date" id="rSprintStart">—</span><span id="pillSprintStart"></span></div>
+          </div>
+          <div class="milestone-row" id="rowFreeze">
+            <span class="milestone-name">Feature freeze</span>
+            <div class="milestone-right"><span class="milestone-date" id="rFreeze">—</span><span class="milestone-sub" id="rFreezeDay"></span><span id="pillFreeze"></span></div>
+          </div>
+          <div class="milestone-row" id="rowSprintEnd">
+            <span class="milestone-name">Sprint end</span>
+            <div class="milestone-right"><span class="milestone-date" id="rSprintEnd">—</span><span id="pillSprintEnd"></span></div>
+          </div>
+        </div>
+        <div class="window-holidays" id="whSprint"><div class="wh-title">Holidays within sprint</div><div id="whSprintList"></div></div>
+      </div>
+
+      <div class="phase-block phase-reg" id="blockReg">
+        <div class="phase-header"><span class="dot"></span> Regression <span class="blocker-count" id="bcReg"></span></div>
+        <div class="phase-body">
+          <div class="milestone-row" id="rowRegStart">
+            <span class="milestone-name">Reg start</span>
+            <div class="milestone-right"><span class="milestone-date" id="rRegStart">—</span><span id="pillRegStart"></span></div>
+          </div>
+          <div class="milestone-row" id="rowRegEnd">
+            <span class="milestone-name">Reg end</span>
+            <div class="milestone-right"><span class="milestone-date" id="rRegEnd">—</span><span id="pillRegEnd"></span></div>
+          </div>
+        </div>
+        <div class="window-holidays" id="whReg"><div class="wh-title">Holidays within regression</div><div id="whRegList"></div></div>
+      </div>
+
+      <div class="phase-block phase-release" id="blockRelease">
+        <div class="phase-header"><span class="dot"></span> Release <span class="blocker-count" id="bcRelease"></span></div>
+        <div class="phase-body">
+          <div class="milestone-row" id="rowEuRelease">
+            <span class="milestone-name">EU release</span>
+            <div class="milestone-right"><span class="milestone-date" id="rEuRelease">—</span><span id="pillEuRelease"></span></div>
+          </div>
+          <div class="milestone-row" id="rowNaRelease">
+            <span class="milestone-name">NA release</span>
+            <div class="milestone-right"><span class="milestone-date" id="rNaRelease">—</span><span id="pillNaRelease"></span></div>
+          </div>
+        </div>
+        <div id="releaseAlertZone" style="display:none;"></div>
+      <div id="sprintOnlyNote" class="sprint-only-note" style="display:none;">&#8505;&#65039; Sprint only mode &#8212; regression and release dates will not be saved.</div>
+      <div class="window-holidays" id="whRelease"><div class="wh-title">Holidays within release</div><div id="whReleaseList"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: Sprint Schedule ── -->
+  <div class="tab-panel" id="tab-history">
+    <div class="history-toolbar">
+      <span class="history-heading">Sprint schedule</span>
+      <span class="history-count" id="historyCount">0 sprints</span>
+    </div>
+    <div class="history-card">
+      <div id="historyBody">
+        <div class="history-empty" id="historyEmpty">No sprints saved yet.<br>Go to the Planner tab, configure your dates and hit "Save sprint".</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: Release Dates ── -->
+  <div class="tab-panel" id="tab-releases">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Release dates</span>
+    </div>
+    <div class="release-filter-bar" id="releaseFilterBar">
+      <button class="release-filter-btn active" onclick="setReleaseFilter('upcoming',this)">Upcoming</button>
+      <button class="release-filter-btn" onclick="setReleaseFilter('past',this)">Past</button>
+      <button class="release-filter-btn" onclick="setReleaseFilter('all',this)">All</button>
+    </div>
+    <div class="history-card">
+      <div id="releaseBody">
+        <div class="history-empty" id="releaseEmpty">No release dates yet.<br>Save a sprint in the Planner tab to populate this list automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: Holidays ── -->
+  <div class="tab-panel" id="tab-holidays">
+    <div class="holiday-toolbar">
+      <span class="holiday-heading">Holidays</span>
+      <button class="btn-add-holiday" onclick="addHoliday()">+ Add holiday</button>
+    </div>
+    <div class="holiday-card">
+      <div class="holiday-list" id="holidayList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PIN Modal -->
+<div class="pin-modal-overlay" id="pinModalOverlay" onclick="handlePinOverlay(event)">
+  <div class="pin-modal">
+    <div class="pin-modal-icon" id="pinModalIcon">🔒</div>
+    <div class="pin-modal-title" id="pinModalTitle">Admin access</div>
+    <div class="pin-modal-sub" id="pinModalSub">Enter your PIN to edit sprint data</div>
+    <input type="password" class="pin-input" id="pinInput" placeholder="••••••••••" maxlength="20" oninput="clearPinError()" onkeydown="if(event.key==='Enter')submitPin()" />
+    <div class="pin-error-msg" id="pinErrorMsg"></div>
+    <button class="pin-submit-btn" onclick="submitPin()">Unlock</button>
+    <button class="pin-cancel-btn" onclick="closePinModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Save Modal -->
+<div class="modal-overlay" id="saveModal" onclick="bgClose(event,'saveModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Save sprint</span>
+      <button class="modal-close" onclick="closeModal('saveModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-label">Sprint name</div>
+      <input type="text" class="text-input" id="sprintNameInput" placeholder="e.g. SP 26.3.1" style="margin-bottom:16px;font-size:15px;font-weight:700;" />
+      <div class="modal-label">Summary</div>
+      <div class="summary-grid" id="saveSummary"></div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('saveModal')">Cancel</button>
+        <button class="btn-primary" onclick="confirmSave()">Save to schedule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cascade Modal -->
+<div class="cascade-modal-overlay" id="cascadeModalOverlay">
+  <div class="cascade-modal">
+    <div class="cascade-modal-header">
+      <div class="cascade-modal-title">🔄 Cascade changes</div>
+      <div class="cascade-modal-sub" id="cascadeModalSub">Following sprints will be updated</div>
+    </div>
+    <div class="cascade-modal-body" id="cascadeModalBody"></div>
+    <div class="cascade-modal-footer">
+      <button class="cascade-cancel-btn" onclick="closeCascadeModal()">Cancel</button>
+      <button class="cascade-skip-btn" onclick="skipCascade()">Save this sprint only</button>
+      <button class="cascade-confirm-btn" onclick="confirmCascade()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirm &amp; Save All
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Slack Modal -->
+<div class="modal-overlay" id="slackModal" onclick="bgClose(event,'slackModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#4A154B"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+        Share to Slack
+      </span>
+      <button class="modal-close" onclick="closeModal('slackModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-label">Sending dates for</div>
+      <div style="background:var(--paper);border:1px solid var(--border-strong);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--ink2);" id="slackLabel">Current sprint</div>
+      <div class="modal-label">Select team</div>
+      <div class="team-grid" id="teamGrid"></div>
+      <div id="webhookSection" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="modal-label" style="margin:0;">Slack webhook URL</span>
+          <span class="saved-badge" id="savedBadge">Saved ✓</span>
+        </div>
+        <input type="text" class="text-input" id="webhookInput" placeholder="https://hooks.slack.com/services/..." />
+        <div class="err-msg" id="webhookError"></div>
+      </div>
+      <div class="modal-label" id="previewLabel" style="display:none;margin-top:14px;">Message preview</div>
+      <div class="preview-box" id="previewBox"></div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('slackModal')">Cancel</button>
+        <button class="btn-send-slack" id="sendBtn" onclick="sendToSlack()">Send to Slack</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Year Picker Modal -->
+<div class="year-picker-overlay" id="yearPickerOverlay" onclick="if(event.target===this)closeYearPicker()">
+  <div class="year-picker-modal">
+    <div class="year-picker-header">
+      <span class="year-picker-title">Add holiday to year</span>
+      <button class="year-picker-close" onclick="closeYearPicker()">&times;</button>
+    </div>
+    <div class="year-picker-body">
+      <div class="year-picker-sub">Select which year to add the holiday to:</div>
+      <div class="year-picker-grid" id="yearPickerGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sprint Details Modal -->
+<div class="sprint-detail-modal-overlay" id="sprintDetailModalOverlay" onclick="if(event.target===this)closeSprintDetailModal()">
+  <div class="sprint-detail-modal">
+    <div class="sprint-detail-modal-header">
+      <span class="sprint-detail-modal-title" id="sprintDetailTitle">Sprint Details</span>
+      <button class="sprint-detail-modal-close" onclick="closeSprintDetailModal()">&times;</button>
+    </div>
+    <div class="sprint-detail-modal-body" id="sprintDetailBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg">Done!</span></div>
+
+<script>
+// ── Supabase config ──
+var SUPABASE_URL = "https://qgxmwntjbnrwfnoynsyq.supabase.co";
+var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFneG13bnRqYm5yd2Zub3luc3lxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNDM1MDMsImV4cCI6MjA5NTkxOTUwM30.SEG_e67a2LEA7qTduamG-JQczn7-84K0QwdCtr64bBU";
+
+function sbHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "apikey": SUPABASE_KEY,
+    "Authorization": "Bearer " + SUPABASE_KEY,
+    "Prefer": "return=representation"
+  };
+}
+
+// ── Supabase CRUD ──
+function sbFetch(path, options) {
+  return fetch(SUPABASE_URL + "/rest/v1/" + path, options);
+}
+
+function dbLoadSprints(callback) {
+  sbFetch("sprints?select=*&order=sprint_start.asc", {
+    method: "GET", headers: sbHeaders()
+  }).then(function(r){ return r.json(); })
+    .then(function(data){ callback(data || []); })
+    .catch(function(){ callback([]); });
+}
+
+function dbSaveSprint(sprint, callback) {
+  // Check if exists (update) or new (insert)
+  if(sprint.id && sprint.id.length > 10) {
+    // update
+    sbFetch("sprints?id=eq." + sprint.id, {
+      method: "PATCH",
+      headers: sbHeaders(),
+      body: JSON.stringify(sprint)
+    }).then(function(r){ return r.json(); })
+      .then(function(data){ callback(data && data[0] ? data[0] : sprint); })
+      .catch(function(){ callback(sprint); });
+  } else {
+    // insert
+    sbFetch("sprints", {
+      method: "POST",
+      headers: sbHeaders(),
+      body: JSON.stringify(sprint)
+    }).then(function(r){ return r.json(); })
+      .then(function(data){ callback(data && data[0] ? data[0] : sprint); })
+      .catch(function(){ callback(sprint); });
+  }
+}
+
+function dbDeleteSprint(id, callback) {
+  sbFetch("sprints?id=eq." + id, {
+    method: "DELETE", headers: sbHeaders()
+  }).then(function(){ callback(); })
+    .catch(function(){ callback(); });
+}
+
+function dbLoadHolidays(callback) {
+  sbFetch("holidays?select=*&order=date.asc", {
+    method: "GET", headers: sbHeaders()
+  }).then(function(r){ return r.json(); })
+    .then(function(data){ callback(data || []); })
+    .catch(function(){ callback([]); });
+}
+
+function dbSaveHolidays(holidaysList, callback) {
+  // Delete all then reinsert
+  sbFetch("holidays", {
+    method: "DELETE",
+    headers: Object.assign({}, sbHeaders(), {"Prefer": "return=minimal"})
+  }).then(function(){
+    if(holidaysList.length === 0){ callback(); return; }
+    var toInsert = holidaysList.filter(function(h){ return h.date && h.label; })
+      .map(function(h){ return {date: h.date, label: h.label}; });
+    if(toInsert.length === 0){ callback(); return; }
+    return sbFetch("holidays", {
+      method: "POST",
+      headers: sbHeaders(),
+      body: JSON.stringify(toInsert)
+    });
+  }).then(function(){ callback(); })
+    .catch(function(){ callback(); });
+}
+
+function dbLoadWebhooks(callback) {
+  try {
+    var wh = JSON.parse(localStorage.getItem("sp_webhooks") || "{}");
+    callback(wh);
+  } catch(e) { callback({}); }
+}
+
+var holidays = [
+  { date:"2026-07-20", label:"Colombia" },
+  { date:"2026-08-07", label:"Colombia" },
+  { date:"2026-08-17", label:"Colombia" },
+  { date:"2026-08-28", label:"India (Rakhi)" },
+  { date:"2026-09-07", label:"USA" },
+  { date:"2026-09-11", label:"Spain" },
+  { date:"2026-10-02", label:"India" },
+  { date:"2026-10-09", label:"Colombia" },
+  { date:"2026-10-12", label:"Colombia" },
+  { date:"2026-10-12", label:"Spain" },
+  { date:"2026-10-12", label:"USA (Columbus Day)" },
+  { date:"2026-10-20", label:"India" },
+  { date:"2026-11-02", label:"Colombia" },
+  { date:"2026-11-02", label:"Spain" },
+  { date:"2026-11-08", label:"India (Diwali)" },
+  { date:"2026-11-09", label:"India (Diwali)" },
+  { date:"2026-11-11", label:"USA (Veterans Day)" },
+  { date:"2026-11-16", label:"Colombia" },
+  { date:"2026-11-16", label:"Spain" },
+  { date:"2026-11-26", label:"USA (Thanksgiving)" },
+  { date:"2026-11-27", label:"USA (Day after Thanksgiving)" },
+  { date:"2026-12-08", label:"Colombia (Immaculate Conception)" },
+  { date:"2026-12-24", label:"USA (Christmas Eve)" },
+  { date:"2026-12-25", label:"USA (Christmas Day)" },
+  { date:"2026-12-25", label:"Colombia (Christmas Day)" }
+];
+var currentDates = {};
+var selectedTeam = null;
+var slackDates = null;
+var SK = "sp_sprints";
+var WK = "sp_webhooks";
+
+// localStorage kept only for webhooks
+function loadSprints() { try { return JSON.parse(localStorage.getItem(SK) || "[]"); } catch(e) { return []; } }
+function saveSprints(a) { try { localStorage.setItem(SK, JSON.stringify(a)); } catch(e) {} }
+function loadWebhooks() { try { return JSON.parse(localStorage.getItem(WK) || "{}"); } catch(e) { return {}; } }
+function saveWebhook(t, u) { var w = loadWebhooks(); w[t] = u; try { localStorage.setItem(WK, JSON.stringify(w)); } catch(e) {} }
+
+function pad(n) { return n < 10 ? "0" + n : "" + n; }
+function todayISO() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth()+1) + "-" + pad(n.getDate()); }
+function toISO(d) { return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+function parseLocal(s) { var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function isWeekend(d) { return d.getDay()===0 || d.getDay()===6; }
+function isHoliday(d) {
+  var iso = toISO(d);
+  for(var i=0;i<holidays.length;i++){if(holidays[i].date===iso)return true;}
+  return false;
+}
+function isWorkday(d) { return !isWeekend(d); }
+function labelsOn(d) {
+  var iso = toISO(d), out=[], seen={};
+  for(var i=0;i<holidays.length;i++){
+    if(holidays[i].date===iso && !seen[holidays[i].label]){
+      seen[holidays[i].label]=true;
+      out.push(holidays[i].label);
+    }
+  }
+  return out;
+}
+function addWorkdays(start, n) {
+  var d = new Date(start);
+  while(!isWorkday(d)) d.setDate(d.getDate()+1);
+  var c=1; while(c<n){ d.setDate(d.getDate()+1); if(isWorkday(d))c++; } return d;
+}
+function nextWorkday(d) { var n=new Date(d); n.setDate(n.getDate()+1); while(!isWorkday(n))n.setDate(n.getDate()+1); return n; }
+function holidaysInRange(s,e) {
+  var out=[], seen={};
+  var cur=new Date(s);
+  while(cur<=e) {
+    var iso=toISO(cur);
+    for(var i=0;i<holidays.length;i++){
+      var key = iso+'|'+holidays[i].label;
+      if(holidays[i].date===iso && !seen[key]){
+        seen[key]=true;
+        out.push({date:new Date(cur), label:holidays[i].label});
+      }
+    }
+    cur.setDate(cur.getDate()+1);
+  }
+  return out;
+}
+function fmt(d) { return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); }
+function fmtShort(d) { return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function fmtMini(d) { return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function el(id) { return document.getElementById(id); }
+
+/* ── Tab switching ── */
+function switchTab(name) {
+  window._currentTab = name;
+  var panels = document.querySelectorAll(".tab-panel");
+  var tabs = document.querySelectorAll(".tab");
+  for(var i=0;i<panels.length;i++) panels[i].classList.remove("active");
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove("active");
+  var p = el("tab-"+name); if(p) p.classList.add("active");
+  var idx = {releases:0,planner:1,history:2,holidays:3}[name];
+  if(tabs[idx]) tabs[idx].classList.add("active");
+  if(name==="history") renderHistory();
+  if(name==="releases") renderReleases();
+  if(name==="holidays") renderHolidays();
+  // Update URL hash for deep linking
+  try { window.location.hash = name; } catch(e) {}
+}
+
+function initTabFromHash() {
+  // Non-admins always see releases only
+  if(!_isAdmin) {
+    switchTab("releases");
+    return;
+  }
+  var hash = window.location.hash.replace("#","");
+  var valid = {planner:1, history:1, releases:1, holidays:1};
+  if(hash && valid[hash]) {
+    switchTab(hash);
+  } else {
+    switchTab("releases");
+  }
+}
+
+/* ── Calculate ── */
+function getNearestMonday(d, direction) {
+  var result = new Date(d);
+  var day = result.getDay();
+  if(direction === "before") {
+    var diff = day === 0 ? 6 : day - 1;
+    result.setDate(result.getDate() - diff);
+  } else {
+    var diff2 = day === 0 ? 1 : 8 - day;
+    result.setDate(result.getDate() + diff2);
+  }
+  return result;
+}
+
+function getReleaseHolidayAlerts(eu, na) {
+  var alerts = [];
+  var checkDates = [
+    { date: eu,                            label: "EU release day" },
+    { date: na,                            label: "NA release day" },
+    { date: getNearestMonday(eu,"before"), label: "Monday before EU release" },
+    { date: getNearestMonday(na,"after"),  label: "Monday after NA release" }
+  ];
+  var alertsSeen = {};
+  for(var i=0; i<checkDates.length; i++) {
+    var cd = checkDates[i];
+    var cdISO = toISO(cd.date);
+    for(var j=0; j<holidays.length; j++) {
+      var key = cdISO+'|'+holidays[j].label+'|'+cd.label;
+      if(holidays[j].date === cdISO && !alertsSeen[key]) {
+        alertsSeen[key] = true;
+        alerts.push({ when: cd.label, holiday: holidays[j].label, date: cd.date });
+      }
+    }
+  }
+  return alerts;
+}
+
+/* ── Planner mode ── */
+var _plannerMode = "release";
+
+function setPlannerMode(mode) {
+  _plannerMode = mode;
+  var relBtn = el("modeRelease");
+  var sprBtn = el("modeSprint");
+  if(relBtn) relBtn.className = "pmt-btn" + (mode==="release" ? " active-release" : "");
+  if(sprBtn) sprBtn.className = "pmt-btn" + (mode==="sprint" ? " active-sprint" : "");
+  var regField = el("regDaysField");
+  if(regField) regField.style.display = mode==="release" ? "" : "none";
+  var phReg = el("blockReg");
+  var phRel = el("blockRelease");
+  if(phReg) phReg.style.display = mode==="release" ? "" : "none";
+  if(phRel) phRel.style.display = mode==="release" ? "" : "none";
+  var note = el("sprintOnlyNote");
+  if(note) note.style.display = mode==="sprint" ? "flex" : "none";
+  var az = el("releaseAlertZone");
+  if(az && mode==="sprint") az.style.display = "none";
+  var configRow = document.querySelector(".config-row");
+  if(configRow) configRow.style.gridTemplateColumns = mode==="sprint" ? "1fr 1fr 1fr" : "";
+  calculate();
+}
+
+/* ── Sprint presets ── */
+var SPRINT_PRESETS = {
+  "12": { ff: "8",  rd: "8"  },
+  "19": { ff: "12", rd: "11" },
+  "22": { ff: "14", rd: "13" },
+  "25": { ff: "16", rd: "15" },
+  "28": { ff: "18", rd: "17" }
+};
+
+function onSprintDaysChange() {
+  var sdEl = el("sprintDays");
+  var sdCustomEl = el("sprintDaysCustom");
+  var val = sdEl ? sdEl.value : "";
+
+  if(val === "custom") {
+    if(sdCustomEl) {
+      sdCustomEl.style.display = "block";
+      sdCustomEl.value = "";
+      sdCustomEl.placeholder = "Enter days (e.g. 22)";
+      sdCustomEl.focus();
+    }
+    return;
+  } else {
+    if(sdCustomEl) sdCustomEl.style.display = "none";
+  }
+
+  // Auto-populate FF and Reg if preset exists
+  var preset = SPRINT_PRESETS[val];
+  if(preset) {
+    var ffEl = el("freezeDay");
+    var rdEl = el("regDays");
+    if(ffEl) {
+      // Set dropdown to matching value
+      for(var i=0;i<ffEl.options.length;i++){
+        if(ffEl.options[i].value === preset.ff) { ffEl.selectedIndex = i; break; }
+      }
+      var ffCustomEl = el("freezeDayCustom");
+      if(ffCustomEl) ffCustomEl.style.display = "none";
+    }
+    if(rdEl) {
+      for(var j=0;j<rdEl.options.length;j++){
+        if(rdEl.options[j].value === preset.rd) { rdEl.selectedIndex = j; break; }
+      }
+      var rdCustomEl = el("regDaysCustom");
+      if(rdCustomEl) rdCustomEl.style.display = "none";
+    }
+  }
+  calculate();
+}
+
+// Handle custom option on FF and Reg dropdowns
+function onFreezeDayChange() {
+  var el2 = el("freezeDay");
+  var cEl = el("freezeDayCustom");
+  if(el2 && el2.value === "custom") {
+    if(cEl) { cEl.style.display = "block"; cEl.value = ""; cEl.placeholder = "Enter day # (e.g. 14)"; cEl.focus(); }
+  } else {
+    if(cEl) cEl.style.display = "none";
+    calculate();
+  }
+}
+
+function onRegDaysChange() {
+  var el2 = el("regDays");
+  var cEl = el("regDaysCustom");
+  if(el2 && el2.value === "custom") {
+    if(cEl) { cEl.style.display = "block"; cEl.value = ""; cEl.placeholder = "Enter days (e.g. 13)"; cEl.focus(); }
+  } else {
+    if(cEl) cEl.style.display = "none";
+    calculate();
+  }
+}
+
+function calculate() {
+  var ssEl=el("sprintStart"), sdEl=el("sprintDays"), fdEl=el("freezeDay"), rdEl=el("regDays");
+  if(!ssEl||!sdEl||!fdEl||!rdEl) return;
+  var startStr = ssEl.value; if(!startStr) return;
+  function getDropdownVal(dropId, customId, fallback) {
+    var drop = el(dropId);
+    if(!drop) return fallback;
+    if(drop.value === "custom") {
+      var cust = el(customId);
+      if(!cust || cust.value === "") return fallback;
+      return parseInt(cust.value)||fallback;
+    }
+    return parseInt(drop.value)||fallback;
+  }
+  var sd = getDropdownVal("sprintDays","sprintDaysCustom",19);
+  var fd = getDropdownVal("freezeDay","freezeDayCustom",12);
+  var rd = getDropdownVal("regDays","regDaysCustom",11);
+
+  // Sprint start = the entered date (advance past weekends only)
+  var ss = parseLocal(startStr);
+  while(ss.getDay()===0||ss.getDay()===6){ ss.setDate(ss.getDate()+1); }
+  var ff=addWorkdays(ss,fd), se=addWorkdays(ss,sd);
+  var rs=nextWorkday(se), re=addWorkdays(rs,rd);
+  var eu=new Date(re), na=nextWorkday(eu);
+
+  currentDates = {sprintStart:ss,featureFreeze:ff,sprintEnd:se,regStart:rs,regEnd:re,euRelease:eu,naRelease:na,sd:sd,fd:fd,rd:rd};
+
+  var milestones = [
+    {id:"SprintStart",date:ss,phase:"sprint"},{id:"Freeze",date:ff,phase:"sprint"},{id:"SprintEnd",date:se,phase:"sprint"},
+    {id:"RegStart",date:rs,phase:"reg"},{id:"RegEnd",date:re,phase:"reg"},
+    {id:"EuRelease",date:eu,phase:"release"},{id:"NaRelease",date:na,phase:"release"}
+  ];
+
+  var pc={sprint:0,reg:0,release:0}, blockers=[];
+  for(var i=0;i<milestones.length;i++){
+    var m=milestones[i], lbl=labelsOn(m.date), blocked=lbl.length>0;
+    setMilestone(m.id,m.date,blocked,lbl);
+    if(blocked){pc[m.phase]++;blockers.push({id:m.id,date:m.date,labels:lbl});}
+  }
+
+  var fdSp=el("rFreezeDay"); if(fdSp) fdSp.textContent="Working day "+fd+" of sprint";
+  setBadge("bcSprint",pc.sprint); setBadge("bcReg",pc.reg); setBadge("bcRelease",pc.release);
+  setBlocker("blockSprint",pc.sprint>0); setBlocker("blockReg",pc.reg>0); setBlocker("blockRelease",pc.release>0);
+  setWindowHols("Sprint",holidaysInRange(ss,se));
+  setWindowHols("Reg",holidaysInRange(rs,re));
+  setWindowHols("Release",holidaysInRange(eu,na));
+
+  // Release holiday alerts on planner page
+  var releaseAlerts = getReleaseHolidayAlerts(eu, na);
+  var alertZone = el("releaseAlertZone");
+  if(alertZone) {
+    if(releaseAlerts.length > 0) {
+      // Separate Monday blockers from release day warnings
+      var mondayBlockers = [];
+      var releaseWarnings = [];
+      for(var ri=0; ri<releaseAlerts.length; ri++) {
+        var al = releaseAlerts[ri];
+        if(al.when.indexOf("Monday") !== -1) {
+          mondayBlockers.push(al);
+        } else {
+          releaseWarnings.push(al);
+        }
+      }
+
+      var html = "";
+
+      // Monday blockers — shown as RED blocker at top
+      if(mondayBlockers.length > 0) {
+        html += '<div class="planner-release-blocker-title">&#128683; Monday holiday blocker</div>';
+        for(var mi=0; mi<mondayBlockers.length; mi++) {
+          var mb = mondayBlockers[mi];
+          var mbDate = mb.date.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+          html += '<div class="planner-release-blocker-row"><span class="planner-blocker-dot"></span><span><strong>' + mb.holiday + '</strong> — ' + mbDate + ' <span class="planner-blocker-context">(' + mb.when + ')</span></span></div>';
+        }
+      }
+
+      // Release day warnings — shown as AMBER below
+      if(releaseWarnings.length > 0) {
+        html += '<div class="planner-release-alert-title' + (mondayBlockers.length > 0 ? ' planner-alert-spacer' : '') + '">&#9888; Holiday on release day</div>';
+        for(var wi=0; wi<releaseWarnings.length; wi++) {
+          var rw = releaseWarnings[wi];
+          var rwDate = rw.date.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+          html += '<div class="planner-release-alert-row"><span class="planner-alert-dot"></span><span><strong>' + rw.holiday + '</strong> — ' + rwDate + ' (' + rw.when + ')</span></div>';
+        }
+      }
+
+      alertZone.innerHTML = html;
+      alertZone.style.display = "flex";
+      alertZone.style.flexDirection = "column";
+      // Make alert zone red if Monday blockers, amber if only warnings
+      if(mondayBlockers.length > 0) {
+        alertZone.style.background = "var(--block-bg)";
+        alertZone.style.border = "1.5px solid var(--block-border)";
+      } else {
+        alertZone.style.background = "#fff3cd";
+        alertZone.style.border = "1.5px solid #f5a623";
+      }
+    } else {
+      alertZone.innerHTML = "";
+      alertZone.style.display = "none";
+    }
+  }
+
+  var banner=el("blockerBanner"), bList=el("blockerList");
+  if(banner && bList){
+    if(blockers.length>0){
+      banner.classList.add("visible");
+      var lm={SprintStart:"Sprint start",Freeze:"Feature freeze",SprintEnd:"Sprint end",RegStart:"Reg start",RegEnd:"Reg end",EuRelease:"EU release",NaRelease:"NA release"};
+      var html="";
+      for(var j=0;j<blockers.length;j++){
+        var b=blockers[j];
+        html+='<div class="blocker-item"><div class="blocker-item-dot"></div><div><div class="blocker-item-milestone">'+(lm[b.id]||b.id)+' — '+fmt(b.date)+'</div><div class="blocker-item-detail">Holiday: '+b.labels.join(", ")+' — please reschedule</div></div></div>';
+      }
+      bList.innerHTML=html;
+    } else { banner.classList.remove("visible"); bList.innerHTML=""; }
+  }
+
+  var ts=el("tbarSprint"); if(ts) ts.style.flex=sd;
+  var tr=el("tbarReg"); if(tr) tr.style.flex=rd;
+}
+
+function setMilestone(id, date, blocked, labels) {
+  var de=el("r"+id), pe=el("pill"+id), re=el("row"+id);
+  if(!de) return;
+  de.textContent=fmt(date);
+  if(blocked){
+    de.classList.add("blocked-date"); if(re)re.classList.add("blocked");
+    if(pe)pe.innerHTML='<span class="blocker-pill"><span class="blocker-pill-dot"></span>Holiday: '+labels.join(", ")+'</span>';
+  } else {
+    de.classList.remove("blocked-date"); if(re)re.classList.remove("blocked"); if(pe)pe.innerHTML="";
+  }
+}
+
+function setWindowHols(phase, hols) {
+  var strip=el("wh"+phase), list=el("wh"+phase+"List");
+  if(!strip||!list) return;
+  if(hols.length===0){strip.classList.remove("visible");list.innerHTML="";return;}
+  var g={};
+  for(var i=0;i<hols.length;i++){ if(!g[hols[i].label])g[hols[i].label]=[]; g[hols[i].label].push(hols[i].date); }
+  var html="";
+  for(var lbl in g){ html+='<div class="wh-row"><span class="wh-dot"></span><span><strong>'+g[lbl].length+' '+lbl+' holiday'+(g[lbl].length>1?"s":"")+'</strong> — '+g[lbl].map(fmtShort).join(", ")+'</span></div>'; }
+  list.innerHTML=html; strip.classList.add("visible");
+}
+
+function setBadge(id,count){ var e=el(id); if(!e)return; if(count>0){e.textContent=count+" blocker"+(count>1?"s":"");e.classList.add("visible");}else{e.textContent="";e.classList.remove("visible");} }
+function setBlocker(id,on){ var e=el(id); if(!e)return; if(on)e.classList.add("has-blocker");else e.classList.remove("has-blocker"); }
+
+/* ── Holidays tab ── */
+function renderHolidays() {
+  // Sort holidays by date before rendering
+  holidays.sort(function(a,b){
+    if(!a.date) return 1;
+    if(!b.date) return -1;
+    return a.date > b.date ? 1 : a.date < b.date ? -1 : 0;
+  });
+  var list=el("holidayList"); if(!list) return;
+  if(holidays.length===0){ list.innerHTML='<div class="holiday-empty">No holidays added yet.</div>'; return; }
+  list.innerHTML="";
+
+  // Group holidays by year
+  var groups = {};
+  var groupOrder = [];
+  for(var i=0; i<holidays.length; i++){
+    var year = holidays[i].date ? holidays[i].date.substring(0,4) : "Unknown";
+    if(!groups[year]){ groups[year]=[]; groupOrder.push(year); }
+    groups[year].push(i);
+  }
+
+  // Sort years newest first (descending), Unknown at bottom
+  groupOrder.sort(function(a, b){
+    if(a === "Unknown") return 1;
+    if(b === "Unknown") return -1;
+    return b > a ? 1 : b < a ? -1 : 0;
+  });
+
+  // Track collapsed state per year (persisted in memory)
+  if(!window._holYearCollapsed) window._holYearCollapsed = {};
+  if(!window._holYearNames) window._holYearNames = {};
+
+  groupOrder.forEach(function(year){
+    var indices = groups[year];
+    var isCollapsed = window._holYearCollapsed[year] === true;
+    var displayName = window._holYearNames[year] || (year === "Unknown" ? "Unknown year" : year + " Holidays");
+
+    var group = document.createElement("div"); group.className = "holiday-year-group";
+
+    // Header
+    var hdr = document.createElement("div"); hdr.className = "holiday-year-header";
+
+    // Editable label for Unknown, plain label for known years
+    var lbl;
+    if(year === "Unknown") {
+      lbl = document.createElement("input");
+      lbl.type = "text";
+      lbl.value = displayName;
+      lbl.style.cssText = "font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);background:none;border:none;border-bottom:1.5px dashed var(--border-strong);outline:none;width:160px;padding:0;cursor:text;";
+      lbl.onclick = function(e){ e.stopPropagation(); };
+      lbl.oninput = function(){ window._holYearNames[year] = this.value; };
+    } else {
+      lbl = document.createElement("span");
+      lbl.className = "holiday-year-label";
+      lbl.textContent = displayName;
+    }
+
+    var right = document.createElement("div"); right.style.cssText = "display:flex;align-items:center;gap:8px;";
+    var cnt = document.createElement("span"); cnt.className = "holiday-year-count"; cnt.textContent = indices.length + " holiday" + (indices.length !== 1 ? "s" : "");
+    var chev = document.createElement("span"); chev.className = "holiday-year-chevron" + (isCollapsed ? "" : " open"); chev.innerHTML = "&#9660;";
+    right.appendChild(cnt); right.appendChild(chev);
+    hdr.appendChild(lbl); hdr.appendChild(right);
+
+    // Body
+    var body = document.createElement("div"); body.className = "holiday-year-body" + (isCollapsed ? " collapsed" : "");
+
+    // Toggle on header click
+    hdr.onclick = (function(y, b, c){
+      return function(){
+        var collapsed = b.classList.contains("collapsed");
+        if(collapsed){ b.classList.remove("collapsed"); c.classList.add("open"); window._holYearCollapsed[y] = false; }
+        else { b.classList.add("collapsed"); c.classList.remove("open"); window._holYearCollapsed[y] = true; }
+      };
+    })(year, body, chev);
+
+    // Holiday rows
+    indices.forEach(function(idx){
+      (function(idx){
+        var row = document.createElement("div"); row.className = "holiday-row";
+        var di = document.createElement("input"); di.type = "date"; di.value = holidays[idx].date;
+        di.oninput = function(){ holidays[idx].date = this.value; calculate(); saveHolidaysLocal(); renderHolidays(); };
+        var ti = document.createElement("input"); ti.type = "text"; ti.value = holidays[idx].label; ti.placeholder = "Country / region";
+        ti.oninput = function(){ holidays[idx].label = this.value; calculate(); saveHolidaysLocal(); };
+        var db = document.createElement("button"); db.className = "del-btn"; db.innerHTML = "&times;";
+        db.onclick = function(){ removeHoliday(idx); };
+        row.appendChild(di); row.appendChild(ti); row.appendChild(db);
+        body.appendChild(row);
+      })(idx);
+    });
+
+    group.appendChild(hdr); group.appendChild(body);
+    list.appendChild(group);
+  });
+}
+function saveHolidaysLocal() {
+  try { localStorage.setItem("sp_holidays", JSON.stringify(holidays)); } catch(e) {}
+}
+function loadHolidaysLocal() {
+  try {
+    var stored = localStorage.getItem("sp_holidays");
+    if(stored) {
+      var parsed = JSON.parse(stored);
+      if(parsed && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function addHoliday(){
+  // Open year picker modal
+  var overlay = el("yearPickerOverlay");
+  var grid = el("yearPickerGrid");
+  if(!overlay || !grid) return;
+  grid.innerHTML = "";
+
+  // Build year options: current year + next 3 years
+  var currentYear = new Date().getFullYear();
+  var years = [currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
+
+  years.forEach(function(y){
+    var btn = document.createElement("button");
+    btn.className = "year-picker-btn";
+    btn.textContent = y;
+    btn.onclick = function(){
+      closeYearPicker();
+      // Add holiday with date defaulting to Jan 1 of selected year
+      var defaultDate = y + "-01-01";
+      holidays.push({ date: defaultDate, label: "" });
+      saveHolidaysLocal();
+      // Ensure that year section is expanded
+      if(!window._holYearCollapsed) window._holYearCollapsed = {};
+      window._holYearCollapsed[String(y)] = false;
+      renderHolidays();
+      // Scroll to that year section
+      setTimeout(function(){
+        var groups = document.querySelectorAll(".holiday-year-group");
+        for(var i=0; i<groups.length; i++){
+          var lbl = groups[i].querySelector(".holiday-year-label");
+          if(lbl && lbl.textContent.indexOf(String(y)) !== -1){
+            groups[i].scrollIntoView({ behavior: "smooth", block: "start" });
+            break;
+          }
+        }
+      }, 100);
+    };
+    grid.appendChild(btn);
+  });
+
+  overlay.classList.add("open");
+}
+
+function closeYearPicker(){
+  var o = el("yearPickerOverlay"); if(o) o.classList.remove("open");
+}
+function removeHoliday(i){ holidays.splice(i,1); renderHolidays(); calculate(); saveHolidaysLocal(); }
+
+/* ── Sprint Schedule tab ── */
+function sprintStatus(startISO, endISO) {
+  var today=new Date(); today.setHours(0,0,0,0);
+  var s=parseLocal(startISO), e=parseLocal(endISO);
+  if(e<today) return {label:"Past",cls:"status-past"};
+  if(s<=today && today<=e) return {label:"Active",cls:"status-active"};
+  return {label:"Upcoming",cls:"status-upcoming"};
+}
+
+function renderHistory() {
+  var body=el("historyBody"), empty=el("historyEmpty"), count=el("historyCount");
+  if(!body) return;
+  if(count) count.textContent = "Loading...";
+  dbLoadSprints(function(sprints) {
+  // normalize field names from Supabase snake_case to camelCase
+  sprints = sprints.map(function(s){ return {
+    id: s.id, name: s.name,
+    sprintStart: s.sprint_start, sprintEnd: s.sprint_end,
+    featureFreeze: s.feature_freeze, regStart: s.reg_start,
+    regEnd: s.reg_end, euRelease: s.eu_release, naRelease: s.na_release,
+    sd: s.sd, fd: s.fd, rd: s.rd, published: s.published
+  };});
+  if(count) count.textContent=sprints.length+" sprint"+(sprints.length!==1?"s":"");
+  if(sprints.length===0){ if(empty)empty.style.display="block"; return; }
+  if(empty) empty.style.display="none";
+  // Build order from saved order, append any new sprints at end
+  var savedOrder = loadSprintOrder();
+  var idMap = {};
+  sprints.forEach(function(s){ idMap[s.id] = s; });
+  var ordered = [];
+  savedOrder.forEach(function(id){ if(idMap[id]){ ordered.push(idMap[id]); delete idMap[id]; } });
+  // Append any sprints not in saved order (new ones)
+  sprints.forEach(function(s){ if(idMap[s.id]) ordered.push(s); });
+  _sprintOrder = ordered.map(function(s){ return s.id; });
+  var sorted = ordered;
+  body.innerHTML="";
+
+  var grid=document.createElement("div"); grid.className="schedule-grid";
+
+  for(var i=0;i<sorted.length;i++){
+    (function(sp){
+      var status=sprintStatus(sp.sprintStart,sp.sprintEnd);
+
+      // Card wrapper
+      var card=document.createElement("div"); card.className="sprint-entry"; card.dataset.id=sp.id;
+
+      // ── Top row ──
+      var top=document.createElement("div"); top.className="entry-top";
+      top.onclick=function(){ toggleExpand(card,sp); };
+
+      var topLeft=document.createElement("div"); topLeft.className="entry-top-left";
+
+      // Drag handle
+      var dragHandle=document.createElement("div"); dragHandle.className="drag-handle";
+      dragHandle.title="Drag to reorder";
+      dragHandle.innerHTML='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
+      dragHandle.addEventListener("mousedown", function(e){ e.stopPropagation(); });
+
+      var chev=document.createElement("div"); chev.className="entry-chevron"; chev.innerHTML="&#8964;";
+
+      var info=document.createElement("div"); info.className="entry-info";
+      var nameEl=document.createElement("div"); nameEl.className="entry-name";
+      var nameText=document.createElement("span"); nameText.textContent=sp.name;
+      var editNameBtn=document.createElement("button"); editNameBtn.className="entry-name-edit-btn";
+      editNameBtn.title="Rename sprint";
+      editNameBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      if(isAdmin()) editNameBtn.style.display="inline-flex";
+      else editNameBtn.style.display="none";
+      editNameBtn.onclick=(function(sid, sname, nt){ return function(e){
+        e.stopPropagation();
+        var newName = prompt("Rename sprint:", sname);
+        if(!newName || !newName.trim() || newName.trim()===sname) return;
+        dbSaveSprint({id:sid, name:newName.trim()}, function(){
+          nt.textContent = newName.trim();
+          showToast("Sprint renamed!");
+        });
+      }; })(sp.id, sp.name, nameText);
+      nameEl.appendChild(nameText); nameEl.appendChild(editNameBtn);
+      var meta=document.createElement("div"); meta.className="entry-meta";
+      var datesEl=document.createElement("span"); datesEl.className="entry-dates";
+      datesEl.textContent=fmtMini(parseLocal(sp.sprintStart))+" → "+fmtMini(parseLocal(sp.sprintEnd));
+      var statusEl=document.createElement("span"); statusEl.className="entry-status "+status.cls; statusEl.textContent=status.label;
+      meta.appendChild(datesEl); meta.appendChild(statusEl);
+      info.appendChild(nameEl); info.appendChild(meta);
+      topLeft.appendChild(dragHandle); topLeft.appendChild(chev); topLeft.appendChild(info);
+
+      // Actions
+      var actions=document.createElement("div"); actions.className="entry-actions";
+
+      var eb=document.createElement("button"); eb.className="entry-edit-btn";
+      eb.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit';
+      if(status.label==="Upcoming" && isAdmin()) eb.classList.add("visible");
+      eb.onclick=function(e){ e.stopPropagation(); editSprint(sp.id); };
+
+      var sb=document.createElement("button"); sb.className="entry-send-btn";
+      sb.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg> Send';
+      sb.onclick=function(e){ e.stopPropagation(); openSlackModal(sp.id); };
+
+      var db=document.createElement("button"); db.className="entry-del-btn"; db.innerHTML="&times;";
+      db.onclick=function(e){ e.stopPropagation(); deleteSprint(sp.id); };
+      if(!isAdmin()) db.style.display="none";
+
+      // Copy button for sprint card
+      var copySpBtn = document.createElement("button");
+      copySpBtn.className = "copy-btn";
+      copySpBtn.title = "Copy dates";
+      copySpBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      copySpBtn.onclick = (function(s){ return function(e){
+        e.stopPropagation();
+        var lines = ["*" + s.name + "*", "----------------------------"];
+        lines.push("Start:           " + fmtMini(parseLocal(s.sprintStart)));
+        lines.push("Feature Freeze:  " + fmtMini(parseLocal(s.featureFreeze)));
+        lines.push("Sprint End:      " + fmtMini(parseLocal(s.sprintEnd)));
+        if(s.regStart)   lines.push("Reg Start:       " + fmtMini(parseLocal(s.regStart)));
+        if(s.regEnd)     lines.push("Reg End:         " + fmtMini(parseLocal(s.regEnd)));
+        if(s.euRelease)  lines.push("EU Release:      " + fmtMini(parseLocal(s.euRelease)));
+        if(s.naRelease)  lines.push("NA Release:      " + fmtMini(parseLocal(s.naRelease)));
+        copyToClipboard(lines.join("\n"), copySpBtn);
+      }; })(sp);
+
+      // Copy card as image for sprint schedule
+      var copyImgSpBtn = document.createElement("button");
+      copyImgSpBtn.className = "copy-btn";
+      copyImgSpBtn.title = "Copy card as image";
+      copyImgSpBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>';
+      copyImgSpBtn.onclick = (function(cardEl, spName, b){ return function(e){
+        e.stopPropagation();
+        // Expand card first if not expanded
+        var wasExpanded = cardEl.classList.contains("expanded");
+        if(!wasExpanded) cardEl.classList.add("expanded");
+        setTimeout(function(){
+          copyCardAsImage(cardEl, spName, b);
+          if(!wasExpanded) setTimeout(function(){ cardEl.classList.remove("expanded"); }, 2500);
+        }, 150);
+      }; })(card, sp.name, copyImgSpBtn);
+
+      actions.appendChild(copySpBtn); actions.appendChild(copyImgSpBtn);
+
+      // Publish button or published badge (admin only)
+      if(isAdmin()) {
+        if(sp.published) {
+          var pubBadge = document.createElement("span");
+          pubBadge.className = "published-badge";
+          pubBadge.innerHTML = '&#10003; Published';
+          actions.appendChild(pubBadge);
+        } else {
+          var draftBadge = document.createElement("span");
+          draftBadge.className = "draft-badge";
+          draftBadge.textContent = "Draft";
+          var pubBtn = document.createElement("button");
+          pubBtn.className = "publish-btn";
+          pubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publish';
+          pubBtn.onclick = (function(sid, pb){ return function(e){
+            e.stopPropagation();
+            if(!confirm("Publish \"" + sp.name + "\" to Release Dates? This will make it visible to everyone.")) return;
+            publishSprint(sid, pb);
+          }; })(sp.id, pubBtn);
+          actions.appendChild(draftBadge);
+          actions.appendChild(pubBtn);
+        }
+      }
+
+      actions.appendChild(eb); actions.appendChild(sb); actions.appendChild(db);
+      top.appendChild(topLeft); top.appendChild(actions);
+
+      // ── Expanded dates panel ──
+      var panel=document.createElement("div"); panel.className="entry-dates-panel";
+      var sections=document.createElement("div"); sections.className="dp-sections";
+
+      // Sprint section
+      var secS=document.createElement("div"); secS.className="dp-section sec-sprint";
+      secS.innerHTML=
+        '<div class="dp-section-label">Sprint</div>'+
+        '<div class="dp-row"><div class="dp-lbl">Start</div><div class="dp-val">'+fmtMini(parseLocal(sp.sprintStart))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">Feature freeze</div><div class="dp-val">'+fmtMini(parseLocal(sp.featureFreeze))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">End</div><div class="dp-val">'+fmtMini(parseLocal(sp.sprintEnd))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">Duration</div><div class="dp-val">'+sp.sd+' days</div></div>';
+
+      // Regression section
+      var secR=document.createElement("div"); secR.className="dp-section sec-reg";
+      secR.innerHTML=
+        '<div class="dp-section-label">Regression</div>'+
+        '<div class="dp-row"><div class="dp-lbl">Start</div><div class="dp-val">'+fmtMini(parseLocal(sp.regStart))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">End</div><div class="dp-val">'+fmtMini(parseLocal(sp.regEnd))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">Duration</div><div class="dp-val">'+sp.rd+' days</div></div>';
+
+      // Release section
+      var secRel=document.createElement("div"); secRel.className="dp-section sec-release";
+      secRel.innerHTML=
+        '<div class="dp-section-label">Release</div>'+
+        '<div class="dp-row"><div class="dp-lbl">EU release</div><div class="dp-val">'+fmtMini(parseLocal(sp.euRelease))+'</div></div>'+
+        '<div class="dp-row"><div class="dp-lbl">NA release</div><div class="dp-val">'+fmtMini(parseLocal(sp.naRelease))+'</div></div>';
+
+      sections.appendChild(secS); sections.appendChild(secR); sections.appendChild(secRel);
+      panel.appendChild(sections);
+
+      // Holiday alerts within this sprint's windows
+      var spStart = parseLocal(sp.sprintStart);
+      var spEnd   = parseLocal(sp.sprintEnd);
+      var rgStart = parseLocal(sp.regStart);
+      var rgEnd   = parseLocal(sp.regEnd);
+      var euDate  = parseLocal(sp.euRelease);
+      var naDate  = parseLocal(sp.naRelease);
+
+      var sprintHols  = holidaysInRange(spStart, spEnd);
+      var regHols     = holidaysInRange(rgStart, rgEnd);
+      var releaseHols = getReleaseHolidayAlerts(euDate, naDate);
+
+      if(sprintHols.length > 0 || regHols.length > 0 || releaseHols.length > 0) {
+        var holStrip = document.createElement("div");
+        holStrip.className = "sched-hol-strip";
+
+        var holTitle = document.createElement("div");
+        holTitle.className = "sched-hol-title";
+        holTitle.innerHTML = "&#9888; Holidays";
+        holStrip.appendChild(holTitle);
+
+        var holGrid = document.createElement("div");
+        holGrid.className = "sched-hol-grid";
+
+        // Helper to add a group
+        function addHolGroup(label, hols, colorCls) {
+          if(hols.length === 0) return;
+          var group = document.createElement("div");
+          group.className = "sched-hol-group";
+          var glbl = document.createElement("div");
+          glbl.className = "sched-hol-group-label " + colorCls;
+          glbl.textContent = label;
+          group.appendChild(glbl);
+          for(var hi = 0; hi < hols.length; hi++) {
+            var h = hols[hi];
+            var hrow = document.createElement("div");
+            hrow.className = "sched-hol-row";
+            var dot = document.createElement("span"); dot.className = "sched-hol-dot";
+            var txt = document.createElement("span");
+            var hdate = h.date ? fmtShort(h.date) : fmtShort(h.date);
+            txt.innerHTML = "<strong>" + (h.label || h.holiday) + "</strong> &mdash; " + (h.date ? fmtShort(h.date) : fmtShort(h.date)) + (h.when ? " <span class='sched-hol-when'>("+h.when+")</span>" : "");
+            hrow.appendChild(dot); hrow.appendChild(txt);
+            group.appendChild(hrow);
+          }
+          holGrid.appendChild(group);
+        }
+
+        addHolGroup("Sprint", sprintHols, "col-sprint");
+        addHolGroup("Regression", regHols, "col-reg");
+        addHolGroup("Release window", releaseHols, "col-release");
+
+        holStrip.appendChild(holGrid);
+        panel.appendChild(holStrip);
+      }
+
+      card.appendChild(top); card.appendChild(panel);
+
+      // Drag events
+      card.setAttribute("draggable","true");
+      card.addEventListener("dragstart", function(e){
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", sp.id);
+        setTimeout(function(){ card.classList.add("dragging"); }, 0);
+      });
+      card.addEventListener("dragend", function(){
+        card.classList.remove("dragging");
+        document.querySelectorAll(".sprint-entry").forEach(function(c){ c.classList.remove("drag-over"); });
+      });
+      card.addEventListener("dragover", function(e){
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        document.querySelectorAll(".sprint-entry").forEach(function(c){ c.classList.remove("drag-over"); });
+        card.classList.add("drag-over");
+      });
+      card.addEventListener("dragleave", function(){
+        card.classList.remove("drag-over");
+      });
+      card.addEventListener("drop", function(e){
+        e.preventDefault();
+        card.classList.remove("drag-over");
+        var draggedId = e.dataTransfer.getData("text/plain");
+        if(draggedId === sp.id) return;
+        reorderSprints(draggedId, sp.id);
+      });
+
+      grid.appendChild(card);
+    })(sorted[i]);
+  }
+  body.appendChild(grid);
+  }); // end dbLoadSprints
+}
+
+function createNewSprint() {
+  // Find the latest sprint end date from saved sprints
+  var sprints = loadSprints();
+  var newStart = "";
+
+  // Always start from today
+  newStart = todayISO();
+
+  // Reset to defaults and set new start date
+  window._editingSprintId = null;
+  var ssEl = el("sprintStart"); if(ssEl) ssEl.value = newStart;
+  var sdEl=el("sprintDays"); if(sdEl){for(var a=0;a<sdEl.options.length;a++){if(sdEl.options[a].value==="19"){sdEl.selectedIndex=a;break;}}}
+  var fdEl=el("freezeDay"); if(fdEl){for(var b=0;b<fdEl.options.length;b++){if(fdEl.options[b].value==="12"){fdEl.selectedIndex=b;break;}}}
+  var rdEl=el("regDays"); if(rdEl){for(var c=0;c<rdEl.options.length;c++){if(rdEl.options[c].value==="11"){rdEl.selectedIndex=c;break;}}}
+  var sdCEl=el("sprintDaysCustom"); if(sdCEl)sdCEl.style.display="none";
+  var fdCEl=el("freezeDayCustom"); if(fdCEl)fdCEl.style.display="none";
+  var rdCEl=el("regDaysCustom"); if(rdCEl)rdCEl.style.display="none";
+
+  // Clear any active selection in schedule
+  var rows = document.querySelectorAll(".sprint-entry");
+  for(var i=0; i<rows.length; i++) rows[i].classList.remove("active-entry","expanded");
+
+  calculate();
+  switchTab("planner");
+  showToast("New sprint ready — adjust dates and save");
+}
+
+function editSprint(id) {
+  window._editingSprintId = id;
+  switchTab("planner");
+  loadSprint(id);
+  showToast("Editing sprint — make changes and save");
+}
+
+function toggleExpand(row, sp) {
+  var isOpen = row.classList.contains("expanded");
+  var allRows = document.querySelectorAll(".sprint-entry");
+  for(var i=0;i<allRows.length;i++) allRows[i].classList.remove("expanded","active-entry");
+  if(!isOpen) {
+    row.classList.add("expanded","active-entry");
+  }
+}
+
+function renderReleases() {
+  var body=el("releaseBody"), empty=el("releaseEmpty"), count=el("releaseCount");
+  if(!body) return;
+  dbLoadSprints(function(sprints) {
+  sprints = sprints.map(function(s){ return {
+    id: s.id, name: s.name,
+    sprintStart: s.sprint_start, sprintEnd: s.sprint_end,
+    featureFreeze: s.feature_freeze, regStart: s.reg_start,
+    regEnd: s.reg_end, euRelease: s.eu_release, naRelease: s.na_release,
+    sd: s.sd, fd: s.fd, rd: s.rd, published: s.published
+  };});
+  // Only show published sprints that have eu/na release dates
+  sprints = sprints.filter(function(s){ return s.published && s.euRelease && s.naRelease; });
+  if(count) count.textContent=sprints.length+" release"+(sprints.length!==1?"s":"");
+  if(sprints.length===0){ if(empty)empty.style.display="block"; return; }
+  if(empty) empty.style.display="none";
+  var today2=new Date(); today2.setHours(0,0,0,0);
+  // Follow same custom drag order as sprint schedule
+  var relSavedOrder = loadSprintOrder();
+  var relIdMap = {};
+  sprints.forEach(function(s){ relIdMap[s.id]=s; });
+  var relOrdered = [];
+  relSavedOrder.forEach(function(id){ if(relIdMap[id]){ relOrdered.push(relIdMap[id]); delete relIdMap[id]; } });
+  sprints.forEach(function(s){ if(relIdMap[s.id]) relOrdered.push(s); });
+  var sorted = relOrdered;
+  body.innerHTML="";
+  if(empty){ empty.style.display="none"; body.appendChild(empty); }
+
+  var grid=document.createElement("div"); grid.className="release-grid";
+
+  // Group sprints by status
+  var groupUpcoming=[], groupPast=[];
+  var today0=new Date(); today0.setHours(0,0,0,0);
+  sorted.forEach(function(sp){
+    var eu=parseLocal(sp.euRelease);
+    if(eu < today0) groupPast.push(sp);
+    else groupUpcoming.push(sp); // active + future both go into Upcoming
+  });
+
+  function makeDivider(label) {
+    var d=document.createElement("div");
+    d.style.cssText="display:flex;align-items:center;gap:10px;margin:14px 0 10px;";
+    var lbl=document.createElement("span");
+    lbl.style.cssText="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;";
+    lbl.textContent=label;
+    var line=document.createElement("span");
+    line.style.cssText="flex:1;height:1px;background:var(--border);";
+    d.appendChild(lbl); d.appendChild(line);
+    return d;
+  }
+
+  function appendGroup(group, label, filterKey) {
+    if(group.length===0) return;
+    if(_releaseFilter !== "all" && _releaseFilter !== filterKey) return;
+    grid.appendChild(makeDivider(label));
+    group.forEach(function(sp){ buildCard(sp, grid); });
+  }
+
+  // If upcoming filter and no upcoming sprints, show a message
+  if(_releaseFilter === "upcoming" && groupUpcoming.length === 0) {
+    var emptyMsg = document.createElement("div");
+    emptyMsg.className = "history-empty";
+    emptyMsg.textContent = "No upcoming releases.";
+    grid.appendChild(emptyMsg);
+  }
+
+  appendGroup(groupUpcoming, "Upcoming", "upcoming");
+  appendGroup(groupPast, "Past", "past");
+
+  function buildCard(sp, grid) {
+    (function(sp){
+      var today=new Date(); today.setHours(0,0,0,0);
+      var eu=parseLocal(sp.euRelease), na=parseLocal(sp.naRelease);
+      var spStart=parseLocal(sp.sprintStart), spEnd=parseLocal(sp.sprintEnd);
+
+      var isPast = eu < today;
+      var statusLabel, statusCls;
+      if(isPast){ statusLabel="Released"; statusCls="status-past"; }
+      else if(spStart<=today && today<=spEnd){ statusLabel="Active sprint"; statusCls="status-active"; }
+      else { statusLabel="Upcoming"; statusCls="status-upcoming"; }
+
+      var diff=Math.round((eu-today)/(1000*60*60*24));
+      var daysAway="";
+      if(diff>0) daysAway="EU release in "+diff+" day"+(diff!==1?"s":"");
+      else if(diff===0) daysAway="EU release today!";
+      else daysAway="Released "+Math.abs(diff)+" day"+(Math.abs(diff)!==1?"s":"")+" ago";
+
+      function fmtDay(d){ return d.toLocaleDateString("en-US",{weekday:"long"}); }
+      function fmtDateBig(d){ return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+
+      var card=document.createElement("div"); card.className="release-card";
+
+      // Header
+      var hdr=document.createElement("div"); hdr.className="release-card-header";
+      var nameWrap=document.createElement("span"); nameWrap.style.display="inline-flex"; nameWrap.style.alignItems="center"; nameWrap.style.gap="6px"; nameWrap.style.minWidth="0";
+      var nameEl=document.createElement("span"); nameEl.className="release-card-name"; nameEl.textContent=sp.name;
+      var detailBtn=document.createElement("button"); detailBtn.className="release-detail-btn"; detailBtn.title="View sprint details"; detailBtn.innerHTML="i";
+      detailBtn.onclick=(function(s){ return function(e){ e.stopPropagation(); openSprintDetailModal(s); }; })(sp);
+      nameWrap.appendChild(nameEl); nameWrap.appendChild(detailBtn);
+      var statusEl=document.createElement("span"); statusEl.className="release-card-status "+statusCls; statusEl.textContent=statusLabel;
+      hdr.appendChild(nameWrap); hdr.appendChild(statusEl);
+
+      // Body
+      var bdy=document.createElement("div"); bdy.className="release-card-body";
+
+      var releaseColorStyle = isPast ? "color:#1a6644;" : "color:#c0392b;";
+      var euSlot=document.createElement("div"); euSlot.className="release-slot eu";
+      euSlot.innerHTML='<div class="release-slot-flag"><span class="release-slot-flag-icon">&#127466;&#127482;</span><span class="release-slot-region" style="'+releaseColorStyle+'font-weight:600;">EU Release</span></div>'+
+        '<div class="release-slot-weekday">'+fmtDay(eu)+'</div>'+
+        '<div class="release-slot-date">'+fmtDateBig(eu)+'</div>';
+
+      var naSlot=document.createElement("div"); naSlot.className="release-slot na";
+      naSlot.innerHTML='<div class="release-slot-flag"><span class="release-slot-flag-icon">&#127482;&#127480;</span><span class="release-slot-region" style="'+releaseColorStyle+'font-weight:600;">NA Release</span></div>'+
+        '<div class="release-slot-weekday">'+fmtDay(na)+'</div>'+
+        '<div class="release-slot-date">'+fmtDateBig(na)+'</div>';
+
+      bdy.appendChild(euSlot); bdy.appendChild(naSlot);
+
+      // Holiday alerts — check: on EU date, on NA date, Monday before EU, Monday after NA
+      function getMonday(d, direction) {
+        var result = new Date(d);
+        var day = result.getDay();
+        if(direction === "before") {
+          // go back to nearest Monday
+          var diff = day === 0 ? 6 : day - 1;
+          result.setDate(result.getDate() - diff);
+        } else {
+          // go forward to next Monday
+          var diff2 = day === 0 ? 1 : 8 - day;
+          result.setDate(result.getDate() + diff2);
+        }
+        return result;
+      }
+
+      var mondayBefore = getMonday(eu, "before");
+      var mondayAfter  = getMonday(na, "after");
+
+      var alertDates = [
+        { date: eu,           label: "EU release day" },
+        { date: na,           label: "NA release day" },
+        { date: mondayBefore, label: "Monday before EU release" },
+        { date: mondayAfter,  label: "Monday after NA release" }
+      ];
+
+      var releaseAlerts = [];
+      for(var ai=0; ai<alertDates.length; ai++) {
+        var ad = alertDates[ai];
+        var adISO = ad.date.getFullYear()+"-"+pad(ad.date.getMonth()+1)+"-"+pad(ad.date.getDate());
+        for(var hi=0; hi<holidays.length; hi++) {
+          if(holidays[hi].date === adISO) {
+            releaseAlerts.push({ when: ad.label, holiday: holidays[hi].label, date: ad.date });
+          }
+        }
+      }
+
+      // Footer
+      var ftr=document.createElement("div"); ftr.className="release-card-footer";
+
+      card.appendChild(hdr); card.appendChild(bdy);
+
+      var daysEl=document.createElement("span"); daysEl.className="release-days-away"; daysEl.textContent=daysAway;
+
+      // Build warning tooltip for footer (next to save button) if there are holiday conflicts
+      var holTip = null;
+      if(releaseAlerts.length > 0) {
+        holTip = document.createElement("span");
+        holTip.className = "release-hol-tip";
+        holTip.setAttribute("tabindex","0");
+        holTip.style.marginLeft = "auto";
+        var tipIcon = document.createElement("span");
+        tipIcon.className = "release-hol-icon";
+        tipIcon.innerHTML = "&#9888;";
+        var tipBox = document.createElement("div");
+        tipBox.className = "release-hol-tipbox";
+        var tipTitle = document.createElement("div");
+        tipTitle.className = "release-hol-tipbox-title";
+        tipTitle.textContent = "Holiday conflicts";
+        tipBox.appendChild(tipTitle);
+        for(var ri=0; ri<releaseAlerts.length; ri++) {
+          var al = releaseAlerts[ri];
+          var tipRow = document.createElement("div");
+          tipRow.className = "release-hol-tipbox-row";
+          tipRow.innerHTML = "<strong>"+al.holiday+"</strong> — "+fmtDateBig(al.date)+" <em style='color:#9ca3af;'>("+al.when+")</em>";
+          tipBox.appendChild(tipRow);
+        }
+        holTip.appendChild(tipIcon);
+        holTip.appendChild(tipBox);
+      }
+      var sendBtn=document.createElement("button"); sendBtn.className="release-send-btn";
+      sendBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg> Send to Slack';
+      sendBtn.onclick=(function(id){ return function(){ openSlackModal(id); }; })(sp.id);
+
+      // ── Single save dropdown (replaces 3 separate buttons) ──
+      var dropWrap = document.createElement("div"); dropWrap.className = "save-dropdown-wrap";
+      var dropTrigger = document.createElement("button"); dropTrigger.className = "save-dropdown-trigger"; dropTrigger.title = "Save options";
+      dropTrigger.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+      var dropMenu = document.createElement("div"); dropMenu.className = "save-dropdown-menu";
+
+      // Save as Text option
+      var itemText = document.createElement("button"); itemText.className = "save-dropdown-item";
+      itemText.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Save as Text';
+      itemText.onclick = (function(spName, euD, naD){ return function(e){
+        e.stopPropagation();
+        dropMenu.classList.remove("open"); dropTrigger.classList.remove("open");
+        var fmtD = function(d){ return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); };
+        var txt = spName + "\n----------------------------\nEU Release:  " + fmtD(euD) + "\nNA Release:  " + fmtD(naD);
+        // Copy to clipboard
+        navigator.clipboard.writeText(txt).catch(function(){});
+        // Also trigger download so user can save wherever they want
+        var blob = new Blob([txt], {type: "text/plain"});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = spName.replace(/[^a-z0-9]/gi,"_") + "_release_dates.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Saved & copied to clipboard!");
+      }; })(sp.name, eu, na);
+
+      // Copy as Image option
+      var itemImg = document.createElement("button"); itemImg.className = "save-dropdown-item";
+      itemImg.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy as Image';
+      itemImg.onclick = (function(cardEl, spName){ return function(e){
+        e.stopPropagation();
+        dropMenu.classList.remove("open"); dropTrigger.classList.remove("open");
+        copyCardAsImage(cardEl, spName, itemImg);
+      }; })(card, sp.name);
+
+      dropMenu.appendChild(itemText); dropMenu.appendChild(itemImg);
+
+      // Toggle dropdown on trigger click
+      dropTrigger.onclick = (function(menu, trigger){ return function(e){
+        e.stopPropagation();
+        var isOpen = menu.classList.contains("open");
+        // Close all other open dropdowns first
+        document.querySelectorAll(".save-dropdown-menu.open").forEach(function(m){ m.classList.remove("open"); });
+        document.querySelectorAll(".save-dropdown-trigger.open").forEach(function(t){ t.classList.remove("open"); });
+        if(!isOpen){ menu.classList.add("open"); trigger.classList.add("open"); }
+      }; })(dropMenu, dropTrigger);
+
+      dropWrap.appendChild(dropMenu); dropWrap.appendChild(dropTrigger);
+
+      // Assemble footer: days away | [spacer] | [⚠ if conflict] [⬇ save dropdown] | [slack]
+      var footerRight = document.createElement("div");
+      footerRight.style.cssText = "display:flex;align-items:center;gap:6px;margin-left:auto;";
+      if(holTip) footerRight.appendChild(holTip);
+      footerRight.appendChild(dropWrap);
+      footerRight.appendChild(sendBtn);
+      ftr.appendChild(daysEl); ftr.appendChild(footerRight);
+      card.appendChild(ftr);
+      grid.appendChild(card);
+    })(sp);
+  } // end buildCard
+
+  body.appendChild(grid);
+  }); // end dbLoadSprints
+}
+
+
+function loadSprint(id) {
+  // Load directly from Supabase to get fresh data with correct field names
+  dbLoadSprints(function(sprints) {
+    var sp = null;
+    for(var i=0;i<sprints.length;i++){if(sprints[i].id===id){sp=sprints[i];break;}}
+    if(!sp) return;
+    // Handle both snake_case (from Supabase) and camelCase (normalized)
+    var sprintStart = sp.sprint_start || sp.sprintStart || "";
+    var sd = sp.sd || 19;
+    var fd = sp.fd || 12;
+    var rd = sp.rd || 11;
+    var ssEl=el("sprintStart"); if(ssEl) ssEl.value=sprintStart;
+    // Set dropdown or custom input
+    function setDropdown(dropId, customId, val) {
+      var dropEl = el(dropId);
+      var custEl = el(customId);
+      if(!dropEl) return;
+      var valStr = String(val);
+      var found = false;
+      for(var ii=0; ii<dropEl.options.length; ii++) {
+        if(dropEl.options[ii].value === valStr) { dropEl.selectedIndex=ii; found=true; break; }
+      }
+      if(!found) {
+        dropEl.value = "custom";
+        if(custEl) { custEl.value = val; custEl.style.display = "block"; }
+      } else {
+        if(custEl) custEl.style.display = "none";
+      }
+    }
+    setDropdown("sprintDays","sprintDaysCustom", sd);
+    setDropdown("freezeDay","freezeDayCustom", fd);
+    setDropdown("regDays","regDaysCustom", rd);
+    calculate();
+    var rows=document.querySelectorAll(".sprint-entry");
+    for(var i=0;i<rows.length;i++) rows[i].classList.toggle("active-entry",rows[i].dataset.id===id);
+    showToast("Loaded: "+sp.name);
+  });
+}
+
+function deleteSprint(id) {
+  dbDeleteSprint(id, function(){
+    showToast("Sprint deleted");
+    renderHistory();
+    if(window._currentTab === "releases") renderReleases();
+  });
+}
+
+function publishSprint(id, btn) {
+  if(btn) { btn.textContent = "Publishing..."; btn.disabled = true; }
+  sbFetch("sprints?id=eq." + id, {
+    method: "PATCH",
+    headers: sbHeaders(),
+    body: JSON.stringify({ published: true })
+  }).then(function(){
+    showToast("Sprint published to Release Dates ✓");
+    renderHistory();
+    renderReleases();
+  }).catch(function(){
+    showToast("Publish failed — try again");
+    if(btn) { btn.textContent = "Publish"; btn.disabled = false; }
+  });
+}
+
+/* ── Save Modal ── */
+function openSaveModal() {
+  if(!currentDates.sprintStart) return;
+  var ni=el("sprintNameInput");
+  if(ni){
+    ni.style.borderColor="";
+    if(window._editingSprintId){
+      // Load name from Supabase
+      dbLoadSprints(function(sprints){
+        for(var k=0;k<sprints.length;k++){
+          if(sprints[k].id===window._editingSprintId){
+            if(ni) ni.value=sprints[k].name||"";
+            break;
+          }
+        }
+      });
+    } else { ni.value=""; }
+  }
+  var sg=el("saveSummary");
+  if(sg){
+    var d=currentDates;
+    sg.innerHTML='<div><div class="summary-lbl">Sprint start</div><div class="summary-val">'+fmt(d.sprintStart)+'</div></div>'+
+      '<div><div class="summary-lbl">Sprint end</div><div class="summary-val">'+fmt(d.sprintEnd)+'</div></div>'+
+      '<div><div class="summary-lbl">Feature freeze</div><div class="summary-val">'+fmt(d.featureFreeze)+'</div></div>'+
+      '<div><div class="summary-lbl">Reg start</div><div class="summary-val">'+fmt(d.regStart)+'</div></div>'+
+      '<div><div class="summary-lbl">Reg end</div><div class="summary-val">'+fmt(d.regEnd)+'</div></div>'+
+      '<div><div class="summary-lbl">EU release</div><div class="summary-val">'+fmt(d.euRelease)+'</div></div>'+
+      '<div><div class="summary-lbl">NA release</div><div class="summary-val">'+fmt(d.naRelease)+'</div></div>'+
+      '<div><div class="summary-lbl">Duration</div><div class="summary-val">'+d.sd+'d sprint · '+d.rd+'d reg</div></div>';
+  }
+  var m=el("saveModal"); if(m) m.classList.add("open");
+  var saveBtn=document.querySelector("#saveModal .btn-primary");
+  if(saveBtn) saveBtn.textContent = window._editingSprintId ? "Update sprint" : "Save to schedule";
+  setTimeout(function(){var ni=el("sprintNameInput");if(ni)ni.focus();},150);
+}
+
+function confirmSave() {
+  var ni=el("sprintNameInput"), name=ni?ni.value.trim():"";
+  if(!name){if(ni)ni.style.borderColor="var(--block-ink)";return;}
+  var d=currentDates;
+  var sp;
+  if(_plannerMode === "sprint") {
+    sp = { name:name, sprint_start:toISO(d.sprintStart), sprint_end:toISO(d.sprintEnd),
+      feature_freeze:toISO(d.featureFreeze), reg_start:"", reg_end:"",
+      eu_release:"", na_release:"", sd:d.sd, fd:d.fd, rd:0, published: false };
+  } else {
+    sp = { name:name, sprint_start:toISO(d.sprintStart), sprint_end:toISO(d.sprintEnd),
+      feature_freeze:toISO(d.featureFreeze), reg_start:toISO(d.regStart),
+      reg_end:toISO(d.regEnd), eu_release:toISO(d.euRelease), na_release:toISO(d.naRelease),
+      sd:d.sd, fd:d.fd, rd:d.rd, published: false };
+  }
+  if(window._editingSprintId) {
+    sp.id = window._editingSprintId;
+    // Keep existing published state when editing — don't reset to false
+    delete sp.published;
+  }
+  var btn = el("saveModal") ? el("saveModal").querySelector(".btn-primary") : null;
+  if(btn) btn.textContent = "Saving...";
+  dbSaveSprint(sp, function(savedSprint) {
+    window._editingSprintId = null;
+    closeModal("saveModal");
+    var isUpdate = !!sp.id;
+    showToast(name + (isUpdate ? " updated!" : " saved!"));
+    if(window._currentTab === "history") renderHistory();
+    if(window._currentTab === "releases") renderReleases();
+
+    // If updating existing sprint, check for cascade
+    if(isUpdate && savedSprint) {
+      dbLoadSprints(function(allSprints) {
+        // normalize
+        var normalized = allSprints.map(function(s){ return {
+          id:s.id, name:s.name,
+          sprint_start:s.sprint_start, sprint_end:s.sprint_end,
+          feature_freeze:s.feature_freeze, reg_start:s.reg_start,
+          reg_end:s.reg_end, eu_release:s.eu_release, na_release:s.na_release,
+          sd:s.sd, fd:s.fd, rd:s.rd
+        };});
+        var cascaded = computeCascadedSprints(savedSprint, normalized);
+        if(cascaded.length > 0) {
+          openCascadeModal(savedSprint, cascaded);
+        }
+      });
+    }
+  });
+}
+
+/* ── Slack Modal ── */
+var TEAMS=[{name:"Vids",emoji:"🎬"},{name:"Forums",emoji:"💬"},{name:"Elite Studio",emoji:"🏢"},{name:"Elite",emoji:"👑"},{name:"Console",emoji:"🎮"},{name:"Go Live",emoji:"🔴"}];
+
+function openSlackModal(sprintId) {
+  selectedTeam=null; slackDates=null;
+  var lbl=el("slackLabel");
+  if(sprintId){
+    var sprints=loadSprints();
+    for(var i=0;i<sprints.length;i++){
+      if(sprints[i].id===sprintId){
+        var sp=sprints[i];
+        slackDates={sprintStart:parseLocal(sp.sprintStart),featureFreeze:parseLocal(sp.featureFreeze),sprintEnd:parseLocal(sp.sprintEnd),regStart:parseLocal(sp.regStart),regEnd:parseLocal(sp.regEnd),euRelease:parseLocal(sp.euRelease),naRelease:parseLocal(sp.naRelease),sd:sp.sd,fd:sp.fd,rd:sp.rd,name:sp.name};
+        if(lbl) lbl.textContent=sp.name; break;
+      }
+    }
+  }
+  if(!slackDates){ slackDates=currentDates; if(lbl)lbl.textContent="Current sprint (unsaved)"; }
+
+  var grid=el("teamGrid"); if(grid) grid.innerHTML="";
+  if(grid){
+    for(var j=0;j<TEAMS.length;j++){
+      (function(t){
+        var c=document.createElement("div"); c.className="team-chip"; c.dataset.name=t.name;
+        c.innerHTML='<span class="team-chip-icon">'+t.emoji+'</span><div class="team-chip-name">'+t.name+'</div>';
+        c.onclick=function(){selectTeam(t.name);}; grid.appendChild(c);
+      })(TEAMS[j]);
+    }
+  }
+  var sb=el("sendBtn"); if(sb)sb.classList.remove("active");
+  var pb=el("previewBox"); if(pb){pb.classList.remove("visible");pb.textContent="";}
+  var pl=el("previewLabel"); if(pl)pl.style.display="none";
+  var ws=el("webhookSection"); if(ws)ws.style.display="none";
+  var we=el("webhookError"); if(we)we.classList.remove("visible");
+  var m=el("slackModal"); if(m)m.classList.add("open");
+}
+
+function selectTeam(name) {
+  selectedTeam=name;
+  var chips=document.querySelectorAll(".team-chip");
+  for(var i=0;i<chips.length;i++) chips[i].classList.toggle("selected",chips[i].dataset.name===name);
+  var wh=loadWebhooks(), saved=wh[name]||"";
+  var wi=el("webhookInput"); if(wi){wi.value=saved;wi.classList.remove("error");}
+  var sb2=el("savedBadge"); if(sb2)sb2.classList.toggle("visible",!!saved);
+  var ws=el("webhookSection"); if(ws)ws.style.display="block";
+  var we=el("webhookError"); if(we)we.classList.remove("visible");
+  var btn=el("sendBtn"); if(btn)btn.classList.add("active");
+  if(slackDates && slackDates.sprintStart){
+    var d=slackDates, label=d.name||"Current sprint";
+    var text="Sprint Dates - "+name+" Team\n"+label+"\n\n"+
+      "Sprint start: "+fmt(d.sprintStart)+"\nFeature freeze: "+fmt(d.featureFreeze)+" (day "+d.fd+")\nSprint end: "+fmt(d.sprintEnd)+"\n\n"+
+      "Reg start: "+fmt(d.regStart)+"\nReg end: "+fmt(d.regEnd)+"\n\nEU release: "+fmt(d.euRelease)+"\nNA release: "+fmt(d.naRelease);
+    var pb=el("previewBox"); if(pb){pb.textContent=text;pb.classList.add("visible");}
+    var pl=el("previewLabel"); if(pl)pl.style.display="block";
+  }
+}
+
+function sendToSlack() {
+  var wi=el("webhookInput"), url=wi?wi.value.trim():"";
+  var errEl=el("webhookError"); if(errEl){errEl.textContent="";errEl.classList.remove("visible");} if(wi)wi.classList.remove("error");
+  if(!url){if(errEl){errEl.textContent="Please enter a Slack webhook URL.";errEl.classList.add("visible");}if(wi)wi.classList.add("error");return;}
+  if(url.indexOf("https://hooks.slack.com/")!==0){if(errEl){errEl.textContent="URL must start with https://hooks.slack.com/";errEl.classList.add("visible");}if(wi)wi.classList.add("error");return;}
+  saveWebhook(selectedTeam,url);
+  var sb2=el("savedBadge"); if(sb2)sb2.classList.add("visible");
+  var d=slackDates, label=d.name||"Current sprint";
+  var payload={blocks:[{type:"header",text:{type:"plain_text",text:"Sprint Dates - "+selectedTeam+" Team",emoji:true}},{type:"context",elements:[{type:"mrkdwn",text:"*"+label+"*"}]},{type:"divider"},{type:"section",fields:[{type:"mrkdwn",text:"*Sprint Start*\n"+fmt(d.sprintStart)},{type:"mrkdwn",text:"*Sprint End*\n"+fmt(d.sprintEnd)},{type:"mrkdwn",text:"*Feature Freeze*\n"+fmt(d.featureFreeze)+" (day "+d.fd+")"},{type:"mrkdwn",text:"*Reg Start*\n"+fmt(d.regStart)},{type:"mrkdwn",text:"*Reg End*\n"+fmt(d.regEnd)},{type:"mrkdwn",text:"*EU Release*\n"+fmt(d.euRelease)},{type:"mrkdwn",text:"*NA Release*\n"+fmt(d.naRelease)}]},{type:"context",elements:[{type:"mrkdwn",text:"Sprint Planner · "+d.sd+"d sprint · "+d.rd+"d regression"}]}]};
+  var btn=el("sendBtn"); if(btn){btn.classList.remove("active");btn.textContent="Sending...";}
+  fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
+    .then(function(){closeModal("slackModal");showToast("Sent to "+selectedTeam+" on Slack!");})
+    .catch(function(){if(errEl){errEl.textContent="Failed. Check your webhook URL.";errEl.classList.add("visible");}if(btn){btn.classList.add("active");btn.textContent="Send to Slack";}});
+}
+
+function closeModal(id){var m=el(id);if(m)m.classList.remove("open");}
+function bgClose(e,id){if(e.target===el(id))closeModal(id);}
+function copyCardAsImage(cardEl, sprintName, btn) {
+  var clone = cardEl.cloneNode(true);
+  clone.style.boxShadow = "0 4px 24px rgba(0,0,0,0.12)";
+  clone.style.width = cardEl.offsetWidth + "px";
+  clone.style.borderRadius = "14px";
+  clone.style.overflow = "hidden";
+  // Remove footer and tooltips from clone
+  var cloneFtr = clone.querySelector(".release-card-footer");
+  if(cloneFtr) cloneFtr.remove();
+  var cloneTipBox = clone.querySelector(".release-hol-tipbox");
+  if(cloneTipBox) cloneTipBox.remove();
+  clone.style.position = "fixed";
+  clone.style.top = "-9999px";
+  clone.style.left = "-9999px";
+  document.body.appendChild(clone);
+
+  html2canvas(clone, { backgroundColor: "#ffffff", scale: 2, useCORS: true, logging: false })
+  .then(function(canvas) {
+    document.body.removeChild(clone);
+    canvas.toBlob(function(blob) {
+      if(!blob) { showToast("Could not copy image"); return; }
+      // Try clipboard API first (Chrome/Edge)
+      if(navigator.clipboard && navigator.clipboard.write) {
+        var item = new ClipboardItem({ "image/png": blob });
+        navigator.clipboard.write([item]).then(function(){
+          if(btn) {
+            var orig = btn.innerHTML;
+            btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+            btn.style.background = "var(--reg-bg)";
+            btn.style.color = "var(--reg-ink)";
+            setTimeout(function(){ btn.innerHTML=orig; btn.style.background=""; btn.style.color=""; }, 2000);
+          }
+          showToast("Image copied! Paste anywhere.");
+        }).catch(function(){
+          // Fallback to download
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url; a.download = (sprintName||"release").replace(/[^a-z0-9]/gi,"-")+".png";
+          a.click(); URL.revokeObjectURL(url);
+          showToast("Saved as image!");
+        });
+      } else {
+        // Safari fallback — download
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = (sprintName||"release").replace(/[^a-z0-9]/gi,"-")+".png";
+        a.click(); URL.revokeObjectURL(url);
+        showToast("Saved as image (paste not supported on this browser)");
+      }
+    }, "image/png");
+  }).catch(function(){
+    document.body.removeChild(clone);
+    showToast("Could not capture image");
+  });
+}
+
+function saveCardAsImage(cardEl, sprintName) {
+  // Clone card, remove footer before capturing
+  var clone = cardEl.cloneNode(true);
+  clone.style.boxShadow = "0 4px 24px rgba(0,0,0,0.12)";
+  clone.style.width = cardEl.offsetWidth + "px";
+  clone.style.borderRadius = "14px";
+  clone.style.overflow = "hidden";
+  // Remove footer from clone
+  var cloneFtr = clone.querySelector(".release-card-footer");
+  if(cloneFtr) cloneFtr.remove();
+  // Remove tooltip tipbox from clone (leave just the icon)
+  var cloneTipBox = clone.querySelector(".release-hol-tipbox");
+  if(cloneTipBox) cloneTipBox.remove();
+  // Append clone off-screen
+  clone.style.position = "fixed";
+  clone.style.top = "-9999px";
+  clone.style.left = "-9999px";
+  document.body.appendChild(clone);
+  html2canvas(clone, {
+    backgroundColor: "#ffffff",
+    scale: 2,
+    useCORS: true,
+    logging: false
+  }).then(function(canvas) {
+    document.body.removeChild(clone);
+    var link = document.createElement("a");
+    link.download = (sprintName || "release-dates").replace(/[^a-z0-9]/gi,"-") + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("Saved as image!");
+  }).catch(function(){
+    document.body.removeChild(clone);
+    showToast("Could not save image");
+  });
+}
+
+/* ── Cascade logic ── */
+var _pendingCascade = []; // array of updated sprint objects to save
+
+function computeCascadedSprints(editedSprint, allSprints) {
+  // Sort all sprints by sprint_start
+  var sorted = allSprints.slice().sort(function(a,b){
+    return new Date(a.sprint_start||a.sprintStart) - new Date(b.sprint_start||b.sprintStart);
+  });
+
+  // Find index of edited sprint
+  var editedIdx = -1;
+  for(var i=0;i<sorted.length;i++){
+    if(sorted[i].id === editedSprint.id){ editedIdx=i; break; }
+  }
+  if(editedIdx === -1 || editedIdx === sorted.length-1) return []; // no following sprints
+
+  var cascaded = [];
+  // The edited sprint's NA release is the anchor
+  var prevNaRelease = editedSprint.na_release || editedSprint.naRelease;
+
+  for(var j = editedIdx+1; j < sorted.length; j++) {
+    var sp = sorted[j];
+    var oldStart = sp.sprint_start || sp.sprintStart;
+    var sd = sp.sd || 19;
+    var fd = sp.fd || 12;
+    var rd = sp.rd || 11;
+
+    // New start = next workday after previous NA release
+    var newStart = nextWorkday(parseLocal(prevNaRelease));
+    var newStartISO = toISO(newStart);
+
+    // Recalculate all dates using existing durations
+    var newFF = addWorkdays(newStart, fd);
+    var newEnd = addWorkdays(newStart, sd);
+    var newRegStart = nextWorkday(newEnd);
+    var newRegEnd = addWorkdays(newRegStart, rd);
+    var newEU = new Date(newRegEnd);
+    var newNA = nextWorkday(newEU);
+
+    cascaded.push({
+      id: sp.id,
+      name: sp.name,
+      // old dates for display
+      old_sprint_start: oldStart,
+      old_sprint_end: sp.sprint_end || sp.sprintEnd,
+      old_eu_release: sp.eu_release || sp.euRelease,
+      old_na_release: sp.na_release || sp.naRelease,
+      // new dates
+      sprint_start: newStartISO,
+      sprint_end: toISO(newEnd),
+      feature_freeze: toISO(newFF),
+      reg_start: toISO(newRegStart),
+      reg_end: toISO(newRegEnd),
+      eu_release: toISO(newEU),
+      na_release: toISO(newNA),
+      sd: sd, fd: fd, rd: rd
+    });
+
+    // Next sprint anchors off this sprint's new NA release
+    prevNaRelease = toISO(newNA);
+  }
+  return cascaded;
+}
+
+function openCascadeModal(editedSprint, cascaded) {
+  _pendingCascade = cascaded;
+  var body = el("cascadeModalBody");
+  var sub = el("cascadeModalSub");
+  if(sub) sub.textContent = cascaded.length + " sprint" + (cascaded.length!==1?"s":"") + " will be updated automatically";
+  if(!body) return;
+  body.innerHTML = "";
+
+  for(var i=0; i<cascaded.length; i++) {
+    var sp = cascaded[i];
+    var card = document.createElement("div"); card.className="cascade-sprint-card";
+    var nameDiv = document.createElement("div"); nameDiv.className="cascade-sprint-name";
+    nameDiv.textContent = sp.name;
+    var changesDiv = document.createElement("div"); changesDiv.className="cascade-changes";
+
+    var rows = [
+      { label:"Sprint start", old:sp.old_sprint_start, nw:sp.sprint_start },
+      { label:"Sprint end",   old:sp.old_sprint_end,   nw:sp.sprint_end },
+      { label:"EU release",   old:sp.old_eu_release,   nw:sp.eu_release },
+      { label:"NA release",   old:sp.old_na_release,   nw:sp.na_release },
+    ];
+    for(var k=0; k<rows.length; k++) {
+      var r = rows[k];
+      if(r.old === r.nw) continue; // skip unchanged
+      var row = document.createElement("div"); row.className="cascade-change-row";
+      var fmtD = function(iso){ try{ return fmt(parseLocal(iso)); }catch(e){return iso;} };
+      row.innerHTML = '<span class="cascade-change-label">'+r.label+'</span>'+
+        '<span class="cascade-old">'+fmtD(r.old)+'</span>'+
+        '<span class="cascade-arrow">→</span>'+
+        '<span class="cascade-new">'+fmtD(r.nw)+'</span>';
+      changesDiv.appendChild(row);
+    }
+    card.appendChild(nameDiv); card.appendChild(changesDiv);
+    body.appendChild(card);
+  }
+
+  var o = el("cascadeModalOverlay"); if(o) o.classList.add("open");
+}
+
+function closeCascadeModal() {
+  var o = el("cascadeModalOverlay"); if(o) o.classList.remove("open");
+  _pendingCascade = [];
+}
+
+function skipCascade() {
+  // Just close modal — original sprint already saved, ignore following sprints
+  closeCascadeModal();
+  showToast("Saved — following sprints unchanged");
+  if(window._currentTab==="history") renderHistory();
+  if(window._currentTab==="releases") renderReleases();
+}
+
+function confirmCascade() {
+  if(_pendingCascade.length === 0){ closeCascadeModal(); return; }
+  var total = _pendingCascade.length;
+  var saved = 0;
+  for(var i=0; i<_pendingCascade.length; i++) {
+    (function(sp){
+      dbSaveSprint(sp, function(){
+        saved++;
+        if(saved === total) {
+          closeCascadeModal();
+          showToast(total + " sprint" + (total!==1?"s":"") + " updated!");
+          if(window._currentTab==="history") renderHistory();
+          if(window._currentTab==="releases") renderReleases();
+        }
+      });
+    })(_pendingCascade[i]);
+  }
+}
+
+/* ── Drag reorder ── */
+var _sprintOrder = []; // array of sprint IDs in display order
+
+function loadSprintOrder() {
+  try { return JSON.parse(localStorage.getItem("sp_order") || "[]"); } catch(e) { return []; }
+}
+function saveSprintOrder(order) {
+  try { localStorage.setItem("sp_order", JSON.stringify(order)); } catch(e) {}
+}
+
+function reorderSprints(draggedId, targetId) {
+  var order = _sprintOrder.slice();
+  var dragIdx = order.indexOf(draggedId);
+  var targetIdx = order.indexOf(targetId);
+  if(dragIdx === -1 || targetIdx === -1) return;
+  order.splice(dragIdx, 1);
+  targetIdx = order.indexOf(targetId);
+  order.splice(targetIdx, 0, draggedId);
+  _sprintOrder = order;
+  saveSprintOrder(order);
+  renderHistory();
+  renderReleases();
+  showToast("Order saved!");
+}
+
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(function(){
+    if(btn) {
+      btn.classList.add("copied");
+      btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(function(){
+        btn.classList.remove("copied");
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      }, 2000);
+    }
+    showToast("Copied to clipboard!");
+  }).catch(function(){
+    showToast("Copy failed — try again");
+  });
+}
+
+var _releaseFilter = "upcoming";
+function setReleaseFilter(filter, btn) {
+  _releaseFilter = filter;
+  var btns = document.querySelectorAll(".release-filter-btn");
+  btns.forEach(function(b){ b.classList.remove("active"); });
+  if(btn) btn.classList.add("active");
+  renderReleases();
+}
+
+function openInfoModal() {
+  var o = el("infoModalOverlay"); if(o) o.classList.add("open");
+}
+function closeInfoModal() {
+  var o = el("infoModalOverlay"); if(o) o.classList.remove("open");
+}
+
+function openSprintDetailModal(sp) {
+  var title = el("sprintDetailTitle");
+  var body = el("sprintDetailBody");
+  if(title) title.textContent = sp.name;
+  if(!body) return;
+
+  var fmtD = function(iso) {
+    if(!iso) return "—";
+    try { return parseLocal(iso).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); } catch(e){ return iso; }
+  };
+
+  var html = "";
+
+  // Sprint section
+  html += '<div class="sdm-section sdm-sprint">';
+  html += '<div class="sdm-section-label">Sprint</div>';
+  html += '<div class="sdm-row"><span class="sdm-lbl">Start</span><span class="sdm-val">'+fmtD(sp.sprintStart||sp.sprint_start)+'</span></div>';
+  html += '<div class="sdm-row"><span class="sdm-lbl">Feature Freeze</span><span class="sdm-val">'+fmtD(sp.featureFreeze||sp.feature_freeze)+' <span style="font-weight:400;color:var(--ink3);font-size:10px;">(day '+(sp.fd||"—")+')</span></span></div>';
+  html += '<div class="sdm-row"><span class="sdm-lbl">End</span><span class="sdm-val">'+fmtD(sp.sprintEnd||sp.sprint_end)+'</span></div>';
+  html += '</div>';
+
+  // Regression section
+  var hasReg = (sp.regStart||sp.reg_start) && (sp.regEnd||sp.reg_end);
+  if(hasReg) {
+    html += '<div class="sdm-section sdm-reg">';
+    html += '<div class="sdm-section-label">Regression</div>';
+    html += '<div class="sdm-row"><span class="sdm-lbl">Start</span><span class="sdm-val">'+fmtD(sp.regStart||sp.reg_start)+'</span></div>';
+    html += '<div class="sdm-row"><span class="sdm-lbl">End</span><span class="sdm-val">'+fmtD(sp.regEnd||sp.reg_end)+'</span></div>';
+    html += '</div>';
+  }
+
+  // Release section
+  html += '<div class="sdm-section sdm-release">';
+  html += '<div class="sdm-section-label">Release</div>';
+  html += '<div class="sdm-row"><span class="sdm-lbl">🇪🇺 EU Release</span><span class="sdm-val">'+fmtD(sp.euRelease||sp.eu_release)+'</span></div>';
+  html += '<div class="sdm-row"><span class="sdm-lbl">🇺🇸 NA Release</span><span class="sdm-val">'+fmtD(sp.naRelease||sp.na_release)+'</span></div>';
+  html += '</div>';
+
+  // Meta
+  html += '<div class="sdm-meta">'+
+    (sp.sd ? sp.sd+' day sprint' : '') +
+    (sp.fd ? ' · freeze day '+sp.fd : '') +
+    (sp.rd ? ' · '+sp.rd+' day regression' : '') +
+  '</div>';
+
+  body.innerHTML = html;
+  var o = el("sprintDetailModalOverlay"); if(o) o.classList.add("open");
+}
+
+function closeSprintDetailModal() {
+  var o = el("sprintDetailModalOverlay"); if(o) o.classList.remove("open");
+}
+
+function showToast(msg){var t=el("toast"),tm=el("toastMsg");if(!t||!tm)return;tm.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},3000);}
+
+/* ── Init ── */
+/* ── Admin PIN lock ── */
+var ADMIN_PIN = "planner";
+var _isAdmin = false;
+
+function isAdmin() { return _isAdmin; }
+
+function openPinModal() {
+  if(_isAdmin) {
+    // Already unlocked — lock again
+    _isAdmin = false;
+    updateLockUI();
+    showToast("Locked — read-only mode");
+    renderReleases();
+    return;
+  }
+  var o = el("pinModalOverlay"); if(o) o.classList.add("open");
+  setTimeout(function(){ var i=el("pinInput"); if(i){ i.value=""; i.focus(); } }, 100);
+}
+
+function closePinModal() {
+  var o = el("pinModalOverlay"); if(o) o.classList.remove("open");
+  clearPinError();
+}
+
+function handlePinOverlay(e) {
+  if(e.target === el("pinModalOverlay")) closePinModal();
+}
+
+function clearPinError() {
+  var em = el("pinErrorMsg"); if(em) em.textContent = "";
+  var pi = el("pinInput"); if(pi) pi.classList.remove("error");
+}
+
+function submitPin() {
+  var pi = el("pinInput");
+  var val = pi ? pi.value : "";
+  if(val === ADMIN_PIN) {
+    _isAdmin = true;
+    closePinModal();
+    updateLockUI();
+    showToast("Admin mode unlocked ✓");
+    switchTab("planner");
+    renderHistory();
+    renderReleases();
+  } else {
+    var pi2 = el("pinInput"); if(pi2) pi2.classList.add("error");
+    var em = el("pinErrorMsg"); if(em) em.textContent = "Incorrect PIN. Try again.";
+    setTimeout(function(){ var pi3=el("pinInput"); if(pi3)pi3.classList.remove("error"); }, 500);
+  }
+}
+
+function updateLockUI() {
+  var btn = el("lockBtn");
+  var txt = el("lockBtnText");
+  var saveBtn = document.querySelector(".sab-save");
+  var tabs = document.querySelector(".tabs");
+  if(_isAdmin) {
+    if(btn) btn.classList.add("unlocked");
+    if(txt) txt.textContent = "Admin ✓";
+    if(saveBtn) saveBtn.style.display = "flex";
+    if(tabs) tabs.classList.add("admin-visible");
+  } else {
+    if(btn) btn.classList.remove("unlocked");
+    if(txt) txt.textContent = "Admin";
+    if(saveBtn) saveBtn.style.display = "none";
+    if(tabs) tabs.classList.remove("admin-visible");
+    switchTab("releases");
+  }
+}
+
+// Override renderHistory to hide edit/delete when not admin
+var _origRenderHistory = null;
+
+var ssEl=el("sprintStart"); if(ssEl) ssEl.value=todayISO();
+window._currentTab = "releases";
+// Init lock UI
+updateLockUI();
+
+// Handle browser back/forward
+window.addEventListener("hashchange", function(){
+  if(!_isAdmin) { switchTab("releases"); return; }
+  var hash = window.location.hash.replace("#","");
+  var valid = {planner:1, history:1, releases:1, holidays:1};
+  if(hash && valid[hash]) switchTab(hash);
+});
+
+// Close save dropdowns when clicking outside
+document.addEventListener("click", function(){
+  document.querySelectorAll(".save-dropdown-menu.open").forEach(function(m){ m.classList.remove("open"); });
+  document.querySelectorAll(".save-dropdown-trigger.open").forEach(function(t){ t.classList.remove("open"); });
+});
+
+// Always load holidays from Supabase first, fall back to localStorage
+dbLoadHolidays(function(data) {
+  if(data && data.length > 0) {
+    // Deduplicate by date+label
+    var seen = {}, deduped = [];
+    for(var i=0; i<data.length; i++){
+      var key = data[i].date+'|'+data[i].label;
+      if(!seen[key]){ seen[key]=true; deduped.push({ date: data[i].date, label: data[i].label }); }
+    }
+    holidays = deduped;
+    saveHolidaysLocal();
+  } else {
+    var storedHols = loadHolidaysLocal();
+    if(storedHols && storedHols.length > 0) holidays = storedHols;
+  }
+  renderHolidays();
+  calculate();
+  initTabFromHash();
+});
+</script>
+</body>
+</html>
