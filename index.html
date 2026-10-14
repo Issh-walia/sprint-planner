@@ -251,6 +251,42 @@
     .planner-release-alert-row { display: flex; align-items: flex-start; gap: 8px; font-family: var(--mono); font-size: 12px; color: #7a4800; line-height: 1.6; }
     .planner-alert-dot { width: 6px; height: 6px; border-radius: 50%; background: #f5a623; flex-shrink: 0; margin-top: 5px; }
 
+    /* ── Meetings Tab ── */
+    .meetings-section-bar { display: flex; gap: 6px; margin-bottom: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+    .meetings-section-btn { flex: 1; padding: 7px 12px; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink3); background: none; border: none; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .meetings-section-btn.active { background: var(--sprint-bg); color: var(--sprint-ink); font-weight: 600; }
+    .meeting-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .meeting-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+    .meeting-card-name { font-size: 13px; font-weight: 700; color: var(--ink); flex: 1; }
+    .meeting-card-date { font-family: var(--mono); font-size: 11px; color: var(--sprint-ink); font-weight: 600; white-space: nowrap; }
+    .meeting-card-meta { font-family: var(--mono); font-size: 10px; color: var(--ink3); margin-bottom: 10px; }
+    .meeting-zoom-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .meeting-zoom-input { flex: 1; font-family: var(--mono); font-size: 11px; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--paper); color: var(--ink2); }
+    .meeting-zoom-input:focus { outline: none; border-color: var(--sprint-ink); }
+    .meeting-outlook-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: #0078d4; background: #e8f4fe; border: 1.5px solid #0078d4; border-radius: 8px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .meeting-outlook-btn:hover { background: #0078d4; color: #fff; }
+    .meeting-section-title { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); margin: 14px 0 8px; }
+    .meeting-group { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+    .meeting-group-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--paper); cursor: pointer; user-select: none; }
+    .meeting-group-title { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+    .meeting-group-count { font-family: var(--mono); font-size: 10px; color: var(--ink3); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1px 8px; }
+    .meeting-group-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.2s; }
+    .meeting-group-chevron.open { transform: rotate(180deg); }
+    .meeting-group-body { display: none; padding: 10px 12px; background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+    .meeting-group-body.collapsed { display: none; }
+    .meeting-group-body.expanded { display: flex; }
+    .meeting-no-sprint { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--ink3); }
+    .scrum-placeholder { background: var(--card); border: 1px dashed var(--border-strong); border-radius: 12px; padding: 32px; text-align: center; }
+    .scrum-placeholder-title { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 6px; }
+    .scrum-placeholder-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+
+    /* ── Schedule section dividers ── */
+    .schedule-section-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0 8px; }
+    .schedule-section-label { font-family: var(--mono); font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); white-space: nowrap; }
+    .schedule-section-line { flex: 1; height: 1px; background: var(--border); }
+    .archive-toggle-btn { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--ink3); background: var(--card); border: 1px solid var(--border-strong); border-radius: 20px; padding: 4px 14px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; margin: 10px auto; }
+    .archive-toggle-btn:hover { background: var(--paper); color: var(--ink2); }
+
     /* ── Publish button & draft badge ── */
     .publish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1.5px solid var(--reg-ink); border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .publish-btn:hover { background: var(--reg-ink); color: #fff; }
@@ -329,8 +365,16 @@
     .holiday-year-count { font-family: var(--mono); font-size: 10px; color: var(--ink3); background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2px 8px; }
     .holiday-year-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.2s; display: inline-block; }
     .holiday-year-chevron.open { transform: rotate(180deg); }
-    .holiday-year-body { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--card); }
+    .holiday-year-body { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; background: var(--card); }
     .holiday-year-body.collapsed { display: none; }
+    .holiday-country-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .holiday-country-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--ink3); background: var(--paper); border: 1px solid var(--border-strong); border-radius: 20px; cursor: pointer; transition: all 0.15s; user-select: none; }
+    .holiday-country-pill:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .holiday-country-pill.active { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); font-weight: 600; }
+    .holiday-country-pill-flag { font-size: 14px; }
+    .holiday-country-pill-count { font-size: 9px; opacity: 0.7; }
+    .holiday-country-body { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: var(--paper); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; }
+    .holiday-country-body.collapsed { display: none; }
 
     .holiday-list { display: flex; flex-direction: column; gap: 8px; }
     .holiday-empty { font-family: var(--mono); font-size: 12px; color: var(--ink3); text-align: center; padding: 2rem; }
@@ -484,6 +528,7 @@
     <button class="tab" onclick="switchTab('releases')">Release dates</button>
     <button class="tab" onclick="switchTab('planner')">Planner</button>
     <button class="tab" onclick="switchTab('history')">Sprint schedule</button>
+    <button class="tab" onclick="switchTab('meetings')">Meetings</button>
     <button class="tab" onclick="switchTab('holidays')">Holidays</button>
   </div>
 
@@ -632,16 +677,24 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Release dates</span>
     </div>
-    <div class="release-filter-bar" id="releaseFilterBar">
-      <button class="release-filter-btn active" onclick="setReleaseFilter('upcoming',this)">Upcoming</button>
-      <button class="release-filter-btn" onclick="setReleaseFilter('past',this)">Past</button>
-      <button class="release-filter-btn" onclick="setReleaseFilter('all',this)">All</button>
-    </div>
+
     <div class="history-card">
       <div id="releaseBody">
         <div class="history-empty" id="releaseEmpty">No release dates yet.<br>Save a sprint in the Planner tab to populate this list automatically.</div>
       </div>
     </div>
+  </div>
+
+  <!-- ── TAB: Meetings ── -->
+  <div class="tab-panel" id="tab-meetings">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+      <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Meetings</span>
+    </div>
+    <div class="meetings-section-bar">
+      <button class="meetings-section-btn active" id="meetBtnRelease" onclick="switchMeetingSection('release')">Release meetings</button>
+      <button class="meetings-section-btn" id="meetBtnScrum" onclick="switchMeetingSection('scrum')">Scrum ceremonies</button>
+    </div>
+    <div id="meetingBody"></div>
   </div>
 
   <!-- ── TAB: Holidays ── -->
@@ -955,11 +1008,12 @@ function switchTab(name) {
   for(var i=0;i<panels.length;i++) panels[i].classList.remove("active");
   for(var i=0;i<tabs.length;i++) tabs[i].classList.remove("active");
   var p = el("tab-"+name); if(p) p.classList.add("active");
-  var idx = {releases:0,planner:1,history:2,holidays:3}[name];
+  var idx = {releases:0,planner:1,history:2,meetings:3,holidays:4}[name];
   if(tabs[idx]) tabs[idx].classList.add("active");
   if(name==="history") renderHistory();
   if(name==="releases") renderReleases();
   if(name==="holidays") renderHolidays();
+  if(name==="meetings") renderMeetings();
   // Update URL hash for deep linking
   try { window.location.hash = name; } catch(e) {}
 }
@@ -971,7 +1025,7 @@ function initTabFromHash() {
     return;
   }
   var hash = window.location.hash.replace("#","");
-  var valid = {planner:1, history:1, releases:1, holidays:1};
+  var valid = {planner:1, history:1, releases:1, holidays:1, meetings:1};
   if(hash && valid[hash]) {
     switchTab(hash);
   } else {
@@ -1288,13 +1342,15 @@ function renderHolidays() {
     return b > a ? 1 : b < a ? -1 : 0;
   });
 
-  // Track collapsed state per year (persisted in memory)
+  // Track collapsed state per year — collapsed by default
   if(!window._holYearCollapsed) window._holYearCollapsed = {};
   if(!window._holYearNames) window._holYearNames = {};
+  if(!window._holActiveCountry) window._holActiveCountry = {};
 
   groupOrder.forEach(function(year){
     var indices = groups[year];
-    var isCollapsed = window._holYearCollapsed[year] === true;
+    // Collapsed by default unless explicitly opened
+    var isCollapsed = window._holYearCollapsed[year] !== false;
     var displayName = window._holYearNames[year] || (year === "Unknown" ? "Unknown year" : year + " Holidays");
 
     var group = document.createElement("div"); group.className = "holiday-year-group";
@@ -1318,7 +1374,7 @@ function renderHolidays() {
     }
 
     var right = document.createElement("div"); right.style.cssText = "display:flex;align-items:center;gap:8px;";
-    var cnt = document.createElement("span"); cnt.className = "holiday-year-count"; cnt.textContent = indices.length + " holiday" + (indices.length !== 1 ? "s" : "");
+    var cnt = document.createElement("span"); cnt.className = "holiday-year-count"; cnt.textContent = indices.length + " holiday" + (indices.length !== 1 ? "s" : "") + " · " + (Object.keys(function(){ var cg={}; indices.forEach(function(i){ var l=holidays[i].label||""; var c="Other"; if(/india/i.test(l))c="India"; else if(/spain/i.test(l))c="Spain"; else if(/usa/i.test(l)||/united states/i.test(l))c="USA"; else if(/colombia/i.test(l))c="Colombia"; cg[c]=1; }); return cg; }()).length + " countries");
     var chev = document.createElement("span"); chev.className = "holiday-year-chevron" + (isCollapsed ? "" : " open"); chev.innerHTML = "&#9660;";
     right.appendChild(cnt); right.appendChild(chev);
     hdr.appendChild(lbl); hdr.appendChild(right);
@@ -1331,24 +1387,78 @@ function renderHolidays() {
       return function(){
         var collapsed = b.classList.contains("collapsed");
         if(collapsed){ b.classList.remove("collapsed"); c.classList.add("open"); window._holYearCollapsed[y] = false; }
-        else { b.classList.add("collapsed"); c.classList.remove("open"); window._holYearCollapsed[y] = true; }
+        else { b.classList.add("collapsed"); c.classList.remove("open"); window._holYearCollapsed[y] = true; window._holActiveCountry[y] = null; }
       };
     })(year, body, chev);
 
-    // Holiday rows
+    // Group by country within year
+    var countryGroups = {}, countryOrder = [];
     indices.forEach(function(idx){
-      (function(idx){
-        var row = document.createElement("div"); row.className = "holiday-row";
-        var di = document.createElement("input"); di.type = "date"; di.value = holidays[idx].date;
-        di.oninput = function(){ holidays[idx].date = this.value; calculate(); saveHolidaysLocal(); renderHolidays(); };
-        var ti = document.createElement("input"); ti.type = "text"; ti.value = holidays[idx].label; ti.placeholder = "Country / region";
-        ti.oninput = function(){ holidays[idx].label = this.value; calculate(); saveHolidaysLocal(); };
-        var db = document.createElement("button"); db.className = "del-btn"; db.innerHTML = "&times;";
-        db.onclick = function(){ removeHoliday(idx); };
-        row.appendChild(di); row.appendChild(ti); row.appendChild(db);
-        body.appendChild(row);
-      })(idx);
+      var lbl = holidays[idx].label || "";
+      var country = "Other";
+      if(/india/i.test(lbl)) country = "India";
+      else if(/spain/i.test(lbl)) country = "Spain";
+      else if(/usa/i.test(lbl) || /united states/i.test(lbl)) country = "USA";
+      else if(/colombia/i.test(lbl)) country = "Colombia";
+      else { var m = lbl.match(/^([^(-]+)/); if(m) country = m[1].trim() || "Other"; }
+      if(!countryGroups[country]){ countryGroups[country]=[]; countryOrder.push(country); }
+      countryGroups[country].push(idx);
     });
+    countryOrder.sort();
+
+    var countryFlags = { India:"🇮🇳", Spain:"🇪🇸", USA:"🇺🇸", Colombia:"🇨🇴" };
+
+    // Horizontal pill row
+    var pillRow = document.createElement("div"); pillRow.className = "holiday-country-pills";
+
+    // Content area for active country
+    var contentArea = document.createElement("div");
+
+    function showCountry(country) {
+      // Accordion — close all, open selected
+      window._holActiveCountry[year] = (window._holActiveCountry[year] === country) ? null : country;
+      // Update pills
+      pillRow.querySelectorAll(".holiday-country-pill").forEach(function(p){
+        p.classList.toggle("active", p.dataset.country === window._holActiveCountry[year]);
+      });
+      // Render content
+      contentArea.innerHTML = "";
+      if(!window._holActiveCountry[year]) return;
+      var activeCountry = window._holActiveCountry[year];
+      var cidxs = countryGroups[activeCountry];
+      var cBody = document.createElement("div"); cBody.className = "holiday-country-body";
+      cidxs.forEach(function(idx){
+        (function(idx){
+          var row=document.createElement("div"); row.className="holiday-row";
+          var di=document.createElement("input"); di.type="date"; di.value=holidays[idx].date;
+          di.oninput=function(){holidays[idx].date=this.value;calculate();saveHolidaysLocal();renderHolidays();};
+          var ti=document.createElement("input"); ti.type="text"; ti.value=holidays[idx].label; ti.placeholder="Country / region";
+          ti.oninput=function(){holidays[idx].label=this.value;calculate();saveHolidaysLocal();};
+          var db=document.createElement("button"); db.className="del-btn"; db.innerHTML="&times;";
+          db.onclick=function(){removeHoliday(idx);};
+          row.appendChild(di); row.appendChild(ti); row.appendChild(db);
+          cBody.appendChild(row);
+        })(idx);
+      });
+      contentArea.appendChild(cBody);
+    }
+
+    countryOrder.forEach(function(country){
+      var cidxs = countryGroups[country];
+      var pill = document.createElement("button"); pill.className = "holiday-country-pill";
+      pill.dataset.country = country;
+      if(window._holActiveCountry[year] === country) pill.classList.add("active");
+      var flag = countryFlags[country] || "🌍";
+      pill.innerHTML = '<span class="holiday-country-pill-flag">' + flag + '</span>' + country + ' <span class="holiday-country-pill-count">(' + cidxs.length + ')</span>';
+      pill.onclick = (function(c){ return function(e){ e.stopPropagation(); showCountry(c); }; })(country);
+      pillRow.appendChild(pill);
+    });
+
+    body.appendChild(pillRow);
+    body.appendChild(contentArea);
+
+    // Restore active country if any
+    if(window._holActiveCountry[year]) showCountry(window._holActiveCountry[year]);
 
     group.appendChild(hdr); group.appendChild(body);
     list.appendChild(group);
@@ -1455,7 +1565,35 @@ function renderHistory() {
 
   var grid=document.createElement("div"); grid.className="schedule-grid";
 
-  for(var i=0;i<sorted.length;i++){
+  // Split into groups
+  var today0=new Date(); today0.setHours(0,0,0,0);
+  var activeGroup=[], upcomingGroup=[], pastGroup=[];
+  sorted.forEach(function(sp){
+    var st=sprintStatus(sp.sprintStart,sp.sprintEnd);
+    if(st.label==="Active") activeGroup.push(sp);
+    else if(st.label==="Upcoming") upcomingGroup.push(sp);
+    else pastGroup.push(sp);
+  });
+
+  // Sort past by date descending (most recent first)
+  pastGroup.sort(function(a,b){ return (b.sprintStart||"") > (a.sprintStart||"") ? 1 : -1; });
+
+  // Previous = most recent past sprint, Archive = rest
+  var previousGroup = pastGroup.slice(0,1);
+  var archiveGroup = pastGroup.slice(1);
+
+  // Archive collapsed state
+  if(window._archiveExpanded === undefined) window._archiveExpanded = false;
+
+  function makeDivider(label) {
+    var d=document.createElement("div"); d.className="schedule-section-divider";
+    var l=document.createElement("span"); l.className="schedule-section-label"; l.textContent=label;
+    var line=document.createElement("span"); line.className="schedule-section-line";
+    d.appendChild(l); d.appendChild(line);
+    return d;
+  }
+
+  function buildSprintCard(sp) {
     (function(sp){
       var status=sprintStatus(sp.sprintStart,sp.sprintEnd);
 
@@ -1721,8 +1859,46 @@ function renderHistory() {
       });
 
       grid.appendChild(card);
-    })(sorted[i]);
+    })(sp);
+  } // end buildSprintCard
+
+  // Render sections in order: Active → Upcoming → Previous → Archive
+  if(activeGroup.length > 0){
+    grid.appendChild(makeDivider("Active"));
+    activeGroup.forEach(function(sp){ buildSprintCard(sp); });
   }
+  if(upcomingGroup.length > 0){
+    grid.appendChild(makeDivider("Upcoming"));
+    upcomingGroup.forEach(function(sp){ buildSprintCard(sp); });
+  }
+  if(previousGroup.length > 0){
+    grid.appendChild(makeDivider("Previous"));
+    previousGroup.forEach(function(sp){ buildSprintCard(sp); });
+  }
+
+  // Archive toggle button
+  if(archiveGroup.length > 0){
+    var archiveBtn = document.createElement("button");
+    archiveBtn.className = "archive-toggle-btn";
+    archiveBtn.innerHTML = (window._archiveExpanded ? "&#9650; Hide archive" : "&#128193; Archive (" + archiveGroup.length + " older sprints)");
+
+    var archiveContainer = document.createElement("div");
+    archiveContainer.id = "archiveContainer";
+    archiveContainer.style.display = window._archiveExpanded ? "block" : "none";
+
+    if(window._archiveExpanded){
+      grid.appendChild(makeDivider("Archive"));
+      archiveGroup.forEach(function(sp){ buildSprintCard(sp); });
+    }
+
+    archiveBtn.onclick = function(){
+      window._archiveExpanded = !window._archiveExpanded;
+      renderHistory();
+    };
+
+    grid.appendChild(archiveBtn);
+  }
+
   body.appendChild(grid);
   }); // end dbLoadSprints
 }
@@ -1800,16 +1976,24 @@ function renderReleases() {
 
   var grid=document.createElement("div"); grid.className="release-grid";
 
-  // Group sprints by status
-  var groupUpcoming=[], groupPast=[];
+  // Group by active/upcoming vs past
+  var groupActive=[], groupUpcoming=[], groupPast=[];
   var today0=new Date(); today0.setHours(0,0,0,0);
   sorted.forEach(function(sp){
     var eu=parseLocal(sp.euRelease);
+    var spStart=parseLocal(sp.sprintStart), spEnd=parseLocal(sp.sprintEnd);
     if(eu < today0) groupPast.push(sp);
-    else groupUpcoming.push(sp); // active + future both go into Upcoming
+    else if(spStart<=today0 && today0<=spEnd) groupActive.push(sp);
+    else groupUpcoming.push(sp);
   });
 
-  function makeDivider(label) {
+  // Sort past newest first
+  groupPast.sort(function(a,b){ return (b.euRelease||"") > (a.euRelease||"") ? 1 : -1; });
+
+  // Archive state
+  if(window._releaseArchiveExpanded === undefined) window._releaseArchiveExpanded = false;
+
+  function makeDividerR(label) {
     var d=document.createElement("div");
     d.style.cssText="display:flex;align-items:center;gap:10px;margin:14px 0 10px;";
     var lbl=document.createElement("span");
@@ -1821,23 +2005,41 @@ function renderReleases() {
     return d;
   }
 
-  function appendGroup(group, label, filterKey) {
-    if(group.length===0) return;
-    if(_releaseFilter !== "all" && _releaseFilter !== filterKey) return;
-    grid.appendChild(makeDivider(label));
-    group.forEach(function(sp){ buildCard(sp, grid); });
+  // Render Active
+  if(groupActive.length > 0){
+    grid.appendChild(makeDividerR("Active"));
+    groupActive.forEach(function(sp){ buildCard(sp, grid); });
   }
 
-  // If upcoming filter and no upcoming sprints, show a message
-  if(_releaseFilter === "upcoming" && groupUpcoming.length === 0) {
-    var emptyMsg = document.createElement("div");
-    emptyMsg.className = "history-empty";
-    emptyMsg.textContent = "No upcoming releases.";
+  // Render Upcoming
+  if(groupUpcoming.length > 0){
+    grid.appendChild(makeDividerR("Upcoming"));
+    groupUpcoming.forEach(function(sp){ buildCard(sp, grid); });
+  }
+
+  // No upcoming message
+  if(groupActive.length === 0 && groupUpcoming.length === 0){
+    var emptyMsg=document.createElement("div"); emptyMsg.className="history-empty";
+    emptyMsg.textContent="No upcoming releases.";
     grid.appendChild(emptyMsg);
   }
 
-  appendGroup(groupUpcoming, "Upcoming", "upcoming");
-  appendGroup(groupPast, "Past", "past");
+  // Archive button + past releases
+  if(groupPast.length > 0){
+    var relArchiveBtn=document.createElement("button");
+    relArchiveBtn.className="archive-toggle-btn";
+    relArchiveBtn.innerHTML=(window._releaseArchiveExpanded ? "&#9650; Hide archive" : "&#128193; Archive (" + groupPast.length + " past release" + (groupPast.length!==1?"s":"") + ")");
+    relArchiveBtn.onclick=function(){
+      window._releaseArchiveExpanded=!window._releaseArchiveExpanded;
+      renderReleases();
+    };
+    grid.appendChild(relArchiveBtn);
+
+    if(window._releaseArchiveExpanded){
+      grid.appendChild(makeDividerR("Archive"));
+      groupPast.forEach(function(sp){ buildCard(sp, grid); });
+    }
+  }
 
   function buildCard(sp, grid) {
     (function(sp){
@@ -2537,13 +2739,266 @@ function copyToClipboard(text, btn) {
   });
 }
 
-var _releaseFilter = "upcoming";
-function setReleaseFilter(filter, btn) {
-  _releaseFilter = filter;
-  var btns = document.querySelectorAll(".release-filter-btn");
+
+
+/* ── Meetings Tab ── */
+var _meetingSection = "release";
+var _meetingZoomLinks = JSON.parse(localStorage.getItem("sp_zoom_links") || "{}");
+
+function switchMeetingSection(section) {
+  _meetingSection = section;
+  var btns = document.querySelectorAll(".meetings-section-btn");
   btns.forEach(function(b){ b.classList.remove("active"); });
-  if(btn) btn.classList.add("active");
-  renderReleases();
+  var active = el("meetBtn" + (section === "release" ? "Release" : "Scrum"));
+  if(active) active.classList.add("active");
+  renderMeetings();
+}
+
+function saveMeetingZoom(key, val) {
+  _meetingZoomLinks[key] = val;
+  localStorage.setItem("sp_zoom_links", JSON.stringify(_meetingZoomLinks));
+}
+
+function createZoomAndOutlook(meeting, btn) {
+  if(!meeting.date || isNaN(meeting.date.getTime())) {
+    showToast("Date not available for this meeting");
+    btn.innerHTML = '🎥 Create Zoom + Add to Outlook';
+    btn.disabled = false;
+    return;
+  }
+
+  var parts = meeting.time.split(":");
+  var startDt = new Date(meeting.date.getFullYear(), meeting.date.getMonth(), meeting.date.getDate(), parseInt(parts[0]), parseInt(parts[1]), 0);
+
+  function pad(n){ return n < 10 ? "0"+n : n; }
+  var startISO = startDt.getFullYear()+"-"+pad(startDt.getMonth()+1)+"-"+pad(startDt.getDate())+"T"+pad(startDt.getHours())+":"+pad(startDt.getMinutes())+":00";
+
+  // Call Anthropic API to create Zoom meeting
+  fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      mcp_servers: [{ type: "url", url: "https://mcp.zoom.us/mcp/zoom/streamable", name: "zoom" }],
+      messages: [{
+        role: "user",
+        content: "Create a Zoom meeting with these exact details and return ONLY the join_url as plain text, nothing else:\n" +
+          "Topic: " + meeting.name + "\n" +
+          "Start time: " + startISO + "\n" +
+          "Timezone: America/Los_Angeles\n" +
+          "Duration: " + meeting.duration + " minutes\n" +
+          "UserId: ishwinder.walia@cvent.com\n" +
+          "Alternative host: Kashan.babar@cvent.com\n" +
+          "Agenda: " + meeting.desc
+      }]
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    var zoomLink = "";
+    if(data && data.content) {
+      for(var i=0; i<data.content.length; i++){
+        var txt = data.content[i].text || "";
+        var match = txt.match(/https:\/\/[^\s]+zoom\.us\/j\/[^\s]+/);
+        if(match){ zoomLink = match[0]; break; }
+        if(txt.indexOf("zoom.us") > -1){ zoomLink = txt.trim(); break; }
+      }
+    }
+    if(zoomLink){
+      showToast("Zoom meeting created! Opening Outlook...");
+      addToOutlook(meeting.name, meeting.date, meeting.time, meeting.duration, zoomLink, meeting.desc);
+    } else {
+      showToast("Zoom created — opening Outlook without link");
+      addToOutlook(meeting.name, meeting.date, meeting.time, meeting.duration, "", meeting.desc);
+    }
+    btn.innerHTML = '✅ Done! Create again?';
+    btn.disabled = false;
+  })
+  .catch(function(err){
+    showToast("Could not create Zoom — opening Outlook only");
+    addToOutlook(meeting.name, meeting.date, meeting.time, meeting.duration, "", meeting.desc);
+    btn.innerHTML = '🎥 Create Zoom + Add to Outlook';
+    btn.disabled = false;
+  });
+}
+
+function addToOutlook(name, date, startTime, duration, zoomLink, description) {
+  if(!date || isNaN(date.getTime())) { showToast("Date not available for this sprint"); return; }
+  var parts = startTime.split(":");
+  var startDt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), parseInt(parts[0]), parseInt(parts[1]), 0);
+  var endDt = new Date(startDt.getTime() + duration * 60000);
+  function pad(n){ return n < 10 ? "0"+n : n; }
+  function fmtOL(d){ return d.getFullYear()+""+pad(d.getMonth()+1)+""+pad(d.getDate())+"T"+pad(d.getHours())+""+pad(d.getMinutes())+"00"; }
+  var body = description || name;
+  if(zoomLink) body += "\n\nZoom Link: " + zoomLink;
+  body += "\n\nCo-host: Kashan Babar (Kashan.babar@cvent.com)";
+  var url = "https://outlook.office.com/calendar/0/deeplink/compose?subject=" + encodeURIComponent(name) +
+    "&startdt=" + fmtOL(startDt) + "&enddt=" + fmtOL(endDt) +
+    "&to=" + encodeURIComponent("Kashan.babar@cvent.com") +
+    "&body=" + encodeURIComponent(body) + "&path=%2Fcalendar%2Faction%2Fcompose";
+  window.open(url, "_blank");
+}
+
+function renderMeetings() {
+  var body = el("meetingBody"); if(!body) return;
+  body.innerHTML = "";
+
+  if(_meetingSection === "scrum") {
+    var ph = document.createElement("div"); ph.className = "scrum-placeholder";
+    ph.innerHTML = '<div class="scrum-placeholder-title">Scrum Ceremonies</div><div class="scrum-placeholder-sub">Coming soon — Sprint Planning, Daily Standup,<br>Sprint Review and Retrospective will appear here.</div>';
+    body.appendChild(ph);
+    return;
+  }
+
+  // Load active sprint from Supabase
+  dbLoadSprints(function(sprints) {
+    var today = new Date(); today.setHours(0,0,0,0);
+    var activeSprint = null;
+    sprints.forEach(function(s){
+      var start = parseLocal(s.sprint_start), end = parseLocal(s.sprint_end);
+      if(start <= today && today <= end) activeSprint = s;
+    });
+    // Fall back to next upcoming sprint if no active
+    if(!activeSprint) {
+      var upcoming = sprints.filter(function(s){ return parseLocal(s.sprint_start) > today; });
+      upcoming.sort(function(a,b){ return a.sprint_start > b.sprint_start ? 1 : -1; });
+      if(upcoming.length) activeSprint = upcoming[0];
+    }
+
+    if(!activeSprint) {
+      var noSp = document.createElement("div"); noSp.className = "meeting-no-sprint";
+      noSp.textContent = "No active or upcoming sprint found. Save a sprint first.";
+      body.appendChild(noSp); return;
+    }
+
+    var sprintId = activeSprint.id;
+    var euRelease = parseLocal(activeSprint.eu_release);
+    var naRelease = parseLocal(activeSprint.na_release);
+    var regStart  = parseLocal(activeSprint.reg_start);
+    var regEnd    = parseLocal(activeSprint.reg_end);
+    var sprintStart = parseLocal(activeSprint.sprint_start);
+    var sprintEnd   = parseLocal(activeSprint.sprint_end);
+
+    function addWorkdaysLocal(d, n) {
+      var r = new Date(d); var c = 0;
+      while(c < n){ r.setDate(r.getDate()+1); var dw=r.getDay(); if(dw!==0&&dw!==6)c++; }
+      return r;
+    }
+    function subDays(d, n){ var r=new Date(d); r.setDate(r.getDate()-n); return r; }
+    function addDays(d, n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+    function nextWorkdayLocal(d){ var r=new Date(d); r.setDate(r.getDate()+1); while(r.getDay()===0||r.getDay()===6) r.setDate(r.getDate()+1); return r; }
+    function regDay6(){ return addWorkdaysLocal(regStart, 5); }
+
+    // Define meetings in 3 groups
+    var meetingGroups = [
+      {
+        name: "🖥️ Core Platform",
+        icon: "🖥️",
+        meetings: [
+          { name:"Core Platform Demo", date:regDay6(), time:"09:30", duration:30, desc:"Core Platform Demo — Day 6 of Regression" },
+          { name:"EU Core Platform Prod Release", date:euRelease, time:"09:00", duration:60, desc:"EU Core Platform Production Release Day." },
+          { name:"NA Core Platform Prod Release", date:naRelease, time:"17:00", duration:60, desc:"NA Core Platform Production Release. 5 PM." },
+          { name:"Streaming Release Planning", date:subDays(euRelease,7), time:"15:00", duration:30, desc:"Streaming Release Planning. 1 week before release. 3PM. 30 min." }
+        ]
+      },
+      {
+        name: "🇪🇺 EU Meetings",
+        icon: "🇪🇺",
+        meetings: [
+          { name:"EU (Pre-deployment): Console/Ehub/Vshow", date:regEnd, time:"09:00", duration:60, desc:"EU Pre-deployment meeting. 1hr before EU Release." },
+          { name:"EU - (Pre-roll) Console/Ehub/Vshow - Prod Release", date:subDays(euRelease,1), time:"15:00", duration:60, desc:"EU Pre-roll. 1 day before EU Release. 3PM–4PM." },
+          { name:"EU - DB Scripts Deployment: Console/Ehub/Vshow", date:euRelease, time:"11:00", duration:60, desc:"EU DB Scripts Deployment. 2hrs before EU Release. 11AM–12PM." },
+          { name:"EU - GCP Microservice", date:euRelease, time:"09:00", duration:30, desc:"EU GCP Microservice release. Thursday 9AM. 30 min." },
+          { name:"EU - On-prem Microservice Primaries", date:euRelease, time:"09:30", duration:30, desc:"EU On-prem Microservice Primaries. Thursday 9:30AM. 30 min." },
+          { name:"EU - On-prem Microservice Secondaries", date:addDays(euRelease,1), time:"10:00", duration:60, desc:"EU On-prem Microservice Secondaries. 1 day after EU Release. 10AM. 1hr." }
+        ]
+      },
+      {
+        name: "🇺🇸 NA Meetings",
+        icon: "🇺🇸",
+        meetings: [
+          { name:"NA (Pre-deployment): Console/Ehub/Vshow", date:nextWorkdayLocal(sprintEnd), time:"09:00", duration:60, desc:"NA Pre-deployment meeting. First day of new sprint." },
+          { name:"NA - (Pre-roll) Console/Ehub/Vshow - Prod Release", date:subDays(naRelease,1), time:"15:00", duration:60, desc:"NA Pre-roll. 1 day before NA Release. 3PM. 1hr." },
+          { name:"NA - DB Scripts Deployment: Console/Ehub/Vshow", date:naRelease, time:"14:00", duration:60, desc:"NA DB Scripts Deployment. Friday 2PM. 1hr." },
+          { name:"NA - GCP Microservice", date:naRelease, time:"13:00", duration:30, desc:"NA GCP Microservice. Friday 1PM. 30 min." },
+          { name:"NA - On-prem Microservice Primaries", date:naRelease, time:"13:30", duration:60, desc:"NA On-prem Microservice Primaries. Friday 1:30PM. 1hr." },
+          { name:"NA - On-prem Microservice Secondaries", date:addDays(naRelease,1), time:"13:00", duration:60, desc:"NA On-prem Microservice Secondaries. 1 day after NA Release. 1PM." }
+        ]
+      }
+    ];
+
+    // Sprint label
+    var spLabel = document.createElement("div"); spLabel.className = "meeting-section-title";
+    spLabel.textContent = "Release meetings — " + (activeSprint.name || "Active Sprint");
+    body.appendChild(spLabel);
+
+    function fmtDateFull(d) {
+      if(!d || isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("en-US", {weekday:"short", month:"short", day:"numeric", year:"numeric"});
+    }
+    function fmtDuration(min) { return min >= 60 ? (min/60)+"hr" : min+"min"; }
+
+    if(!window._meetGroupCollapsed) window._meetGroupCollapsed = { "🖥️ Core Platform": false, "🇪🇺 EU Meetings": true, "🇺🇸 NA Meetings": true };
+
+    meetingGroups.forEach(function(group) {
+      var isCollapsed = window._meetGroupCollapsed[group.name] !== false;
+
+      var grpEl = document.createElement("div"); grpEl.className = "meeting-group";
+
+      // Group header
+      var grpHdr = document.createElement("div"); grpHdr.className = "meeting-group-header";
+      var grpTitle = document.createElement("div"); grpTitle.className = "meeting-group-title";
+      grpTitle.textContent = group.name;
+      var grpRight = document.createElement("div"); grpRight.style.cssText = "display:flex;align-items:center;gap:8px;";
+      var grpCnt = document.createElement("span"); grpCnt.className = "meeting-group-count";
+      grpCnt.textContent = group.meetings.length + " meetings";
+      var grpChev = document.createElement("span"); grpChev.className = "meeting-group-chevron" + (isCollapsed ? "" : " open");
+      grpChev.innerHTML = "&#9660;";
+      grpRight.appendChild(grpCnt); grpRight.appendChild(grpChev);
+      grpHdr.appendChild(grpTitle); grpHdr.appendChild(grpRight);
+
+      // Group body
+      var grpBody = document.createElement("div");
+      grpBody.className = "meeting-group-body " + (isCollapsed ? "collapsed" : "expanded");
+
+      grpHdr.onclick = (function(gn, gb, gc) { return function() {
+        var collapsed = gb.classList.contains("collapsed");
+        if(collapsed) { gb.classList.remove("collapsed"); gb.classList.add("expanded"); gc.classList.add("open"); window._meetGroupCollapsed[gn] = false; }
+        else { gb.classList.add("collapsed"); gb.classList.remove("expanded"); gc.classList.remove("open"); window._meetGroupCollapsed[gn] = true; }
+      };})(group.name, grpBody, grpChev);
+
+      // Build meeting cards inside group
+      group.meetings.forEach(function(m, i) {
+        var key = sprintId + "_" + group.name + "_" + i;
+        var card = document.createElement("div"); card.className = "meeting-card";
+
+        var hdr = document.createElement("div"); hdr.className = "meeting-card-header";
+        var nameEl = document.createElement("div"); nameEl.className = "meeting-card-name"; nameEl.textContent = m.name;
+        var dateEl = document.createElement("div"); dateEl.className = "meeting-card-date"; dateEl.textContent = fmtDateFull(m.date);
+        hdr.appendChild(nameEl); hdr.appendChild(dateEl);
+
+        var meta = document.createElement("div"); meta.className = "meeting-card-meta";
+        meta.textContent = m.time + " · " + fmtDuration(m.duration);
+
+        var btnRow = document.createElement("div"); btnRow.style.cssText = "display:flex;gap:8px;align-items:center;flex-wrap:wrap;";
+        var outlookBtn = document.createElement("button"); outlookBtn.className = "meeting-outlook-btn";
+        outlookBtn.innerHTML = '🎥 Create Zoom + Add to Outlook';
+        outlookBtn.onclick = (function(meeting, btn){ return function(){
+          btn.innerHTML = "⏳ Creating Zoom meeting...";
+          btn.disabled = true;
+          createZoomAndOutlook(meeting, btn);
+        }; })(m, outlookBtn);
+
+        btnRow.appendChild(outlookBtn);
+        card.appendChild(hdr); card.appendChild(meta); card.appendChild(btnRow);
+        grpBody.appendChild(card);
+      });
+
+      grpEl.appendChild(grpHdr); grpEl.appendChild(grpBody);
+      body.appendChild(grpEl);
+    });
+  });
 }
 
 function openInfoModal() {
@@ -2691,7 +3146,7 @@ updateLockUI();
 window.addEventListener("hashchange", function(){
   if(!_isAdmin) { switchTab("releases"); return; }
   var hash = window.location.hash.replace("#","");
-  var valid = {planner:1, history:1, releases:1, holidays:1};
+  var valid = {planner:1, history:1, releases:1, holidays:1, meetings:1};
   if(hash && valid[hash]) switchTab(hash);
 });
 
