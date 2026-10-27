@@ -464,10 +464,37 @@
     .scard-tooltip-val { font-weight: 600; color: #fff; }
     .scard-tooltip-hol { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #fcd34d; }
     /* Expand panel */
-    /* Chevron toggle button — darker, highlighted when open */
-    .scard-chevron { width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid #9ab8a6; background: #f0faf4; color: #1a6b3c; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; margin-right: 6px; }
+    /* Chevron toggle button */
+    .scard-chevron { width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid #9ab8a6; background: #f0faf4; color: #1a6b3c; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; }
     .scard-chevron:hover { background: #1a6b3c; color: #fff; border-color: #1a6b3c; }
     .scard-chevron.open { background: #1a6b3c; border-color: #1a6b3c; color: #fff; }
+    /* Name row — tight gap */
+    .scard-name-row { display: flex; align-items: center; padding: 12px 16px; gap: 8px; }
+    /* Name wrap */
+    .scard-name { font-size: 14px; font-weight: 800; color: #0d2618; cursor: pointer; position: relative; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .scard-name:hover > span:first-child { color: #1a6b3c; }
+    .scard-name-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    /* Edit btn right next to name */
+    .entry-edit-btn { font-size: 10px; font-weight: 600; color: #4a6058; background: #fff; border: 1px solid #c8ddd2; border-radius: 6px; padding: 2px 9px; white-space: nowrap; flex-shrink: 0; cursor: pointer; display: none; }
+    .entry-edit-btn.visible { display: inline-flex; align-items: center; gap: 4px; }
+    /* Sub line */
+    .scard-sub { font-size: 10px; color: #9ab8a6; padding: 0 16px 10px 50px; }
+    /* Pub row — bottom right */
+    .scard-pub-row { display: flex; align-items: center; justify-content: flex-end; padding: 8px 16px; background: #fafcfb; border-top: 1px solid #f0f5f1; gap: 8px; }
+    .scard-pub-left { display: flex; align-items: center; gap: 6px; }
+    /* Toggle switch */
+    .pub-toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .pub-toggle-lbl { font-size: 11px; font-weight: 600; color: #b0c4b8; }
+    .pub-toggle-lbl.active { color: #1a6b3c; }
+    .pub-toggle { width: 38px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .pub-toggle.on { background: #1a6b3c; }
+    .pub-toggle.off { background: #d4e0da; }
+    .pub-toggle::after { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .pub-toggle.on::after { left: 18px; }
+    .pub-toggle.off::after { left: 2px; }
+    /* Del btn */
+    .entry-del-btn { background: none; border: 1px solid #e0ebe4; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; color: #c8ddd2; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; flex-shrink: 0; }
+    .entry-del-btn:hover { background: #fff0f0; border-color: #fca5a5; color: #dc2626; }
     /* Expand panel */
     .scard-expand { display: none; border-top: 2px solid #e0ebe4; background: #f8fbf9; }
     .scard-expand.open { display: block; }
@@ -1156,6 +1183,18 @@ function dbSaveHolidays(holidaysList, callback) {
     .catch(function(){ callback(); });
 }
 
+var _holSaveTimer = null;
+function autoSaveHolidays() {
+  // Debounce — wait 800ms after last change before saving
+  if(_holSaveTimer) clearTimeout(_holSaveTimer);
+  _holSaveTimer = setTimeout(function(){
+    saveHolidaysLocal();
+    dbSaveHolidays(holidays, function(){
+      showToast("Holidays saved ✓");
+    });
+  }, 800);
+}
+
 function dbLoadWebhooks(callback) {
   try {
     var wh = JSON.parse(localStorage.getItem("sp_webhooks") || "{}");
@@ -1681,9 +1720,9 @@ function renderHolidays() {
         (function(idx){
           var row=document.createElement("div"); row.className="holiday-row";
           var di=document.createElement("input"); di.type="date"; di.value=holidays[idx].date;
-          di.oninput=function(){holidays[idx].date=this.value;calculate();saveHolidaysLocal();renderHolidays();};
+          di.oninput=function(){holidays[idx].date=this.value;calculate();autoSaveHolidays();renderHolidays();};
           var ti=document.createElement("input"); ti.type="text"; ti.value=holidays[idx].label; ti.placeholder="Country / region";
-          ti.oninput=function(){holidays[idx].label=this.value;calculate();saveHolidaysLocal();};
+          ti.oninput=function(){holidays[idx].label=this.value;calculate();autoSaveHolidays();};
           var db=document.createElement("button"); db.className="del-btn"; db.innerHTML="&times;";
           db.onclick=function(){removeHoliday(idx);};
           row.appendChild(di); row.appendChild(ti); row.appendChild(db);
@@ -1748,7 +1787,7 @@ function addHoliday(){
       // Add holiday with date defaulting to Jan 1 of selected year
       var defaultDate = y + "-01-01";
       holidays.push({ date: defaultDate, label: "" });
-      saveHolidaysLocal();
+      autoSaveHolidays();
       // Ensure that year section is expanded
       if(!window._holYearCollapsed) window._holYearCollapsed = {};
       window._holYearCollapsed[String(y)] = false;
@@ -1774,7 +1813,7 @@ function addHoliday(){
 function closeYearPicker(){
   var o = el("yearPickerOverlay"); if(o) o.classList.remove("open");
 }
-function removeHoliday(i){ holidays.splice(i,1); renderHolidays(); calculate(); saveHolidaysLocal(); }
+function removeHoliday(i){ holidays.splice(i,1); renderHolidays(); calculate(); autoSaveHolidays(); }
 
 /* ── Sprint Schedule tab ── */
 function sprintStatus(startISO, endISO) {
@@ -1858,6 +1897,9 @@ function renderHistory() {
 
       // ── Name row ──
       var nameRow=document.createElement("div"); nameRow.className="scard-name-row";
+      var dragHandle2=document.createElement("div"); dragHandle2.className="drag-handle";
+      dragHandle2.innerHTML='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
+      dragHandle2.addEventListener("mousedown", function(e){ e.stopPropagation(); });
       var chevBtn=document.createElement("button"); chevBtn.className="scard-chevron"; chevBtn.innerHTML="▾";
       var nameEl=document.createElement("div"); nameEl.className="scard-name";
       var nameText=document.createElement("span"); nameText.textContent=sp.name;
@@ -1882,22 +1924,24 @@ function renderHistory() {
         ttHol.textContent="⚠ "+holsInRange.length+" holiday"+(holsInRange.length!==1?"s":"")+" in this sprint";
         tooltip.appendChild(ttHol);
       }
-      nameEl.appendChild(nameText); nameEl.appendChild(tooltip);
-      var nameRight=document.createElement("div"); nameRight.className="scard-name-right";
-      var statusEl=document.createElement("span"); statusEl.className="entry-status "+status.cls; statusEl.textContent=status.label;
-      nameRight.appendChild(statusEl);
-
-      // Edit btn (upcoming only)
+      // Edit btn inside name wrap (upcoming only)
       var eb=document.createElement("button"); eb.className="entry-edit-btn";
       eb.innerHTML='✎ Edit';
       if(status.label==="Upcoming" && isAdmin()) eb.classList.add("visible");
       eb.onclick=function(e){ e.stopPropagation(); editSprint(sp.id); };
-      nameRight.appendChild(eb);
 
-      var dragHandle=document.createElement("div"); dragHandle.className="drag-handle";
-      dragHandle.innerHTML='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
-      dragHandle.addEventListener("mousedown", function(e){ e.stopPropagation(); });
-      nameRow.appendChild(dragHandle); nameRow.appendChild(chevBtn); nameRow.appendChild(nameEl); nameRow.appendChild(nameRight);
+      nameEl.appendChild(nameText); nameEl.appendChild(tooltip); nameEl.appendChild(eb);
+
+      var nameRight=document.createElement("div"); nameRight.className="scard-name-right";
+      var statusEl=document.createElement("span"); statusEl.className="entry-status "+status.cls; statusEl.textContent=status.label;
+      nameRight.appendChild(statusEl);
+
+      // Del btn
+      var db2=document.createElement("button"); db2.className="entry-del-btn"; db2.innerHTML="&times;";
+      db2.onclick=function(e){ e.stopPropagation(); deleteSprint(sp.id); };
+      if(isAdmin()) nameRight.appendChild(db2);
+
+      nameRow.appendChild(dragHandle2); nameRow.appendChild(chevBtn); nameRow.appendChild(nameEl); nameRow.appendChild(nameRight);
       card.appendChild(nameRow);
 
       // Sub
@@ -1907,57 +1951,35 @@ function renderHistory() {
 
       // No always-visible date table — dates shown in expand panel only
 
-      // ── Pub row ──
+      // ── Pub row — toggle switch ──
       var pubRow=document.createElement("div"); pubRow.className="scard-pub-row";
-      var pubLeft=document.createElement("div"); pubLeft.className="scard-pub-left";
-      var pubRight=document.createElement("div"); pubRight.style.cssText="display:flex;align-items:center;gap:6px;";
 
-      var right=document.createElement("div"); // keep for compat
-
-      // Publish controls in pubLeft/pubRight
       if(isAdmin()) {
-        if(status.label === "Past") {
-          var pubBadge = document.createElement("span");
-          pubBadge.className = sp.published ? "published-badge" : "draft-badge";
-          pubBadge.innerHTML = sp.published ? "&#10003; Published" : "Draft";
-          pubLeft.appendChild(pubBadge);
-        } else {
-          if(sp.published) {
-            var pubBadge2 = document.createElement("span");
-            pubBadge2.className = "published-badge";
-            pubBadge2.innerHTML = "&#10003; Published";
-            var unpubBtn = document.createElement("button");
-            unpubBtn.className = "unpublish-btn";
-            unpubBtn.innerHTML = "&#x2715; Unpublish";
-            unpubBtn.onclick = (function(sid, ub){ return function(e){
-              e.stopPropagation();
-              if(!confirm("Unpublish \"" + sp.name + "\"?")) return;
-              unpublishSprint(sid, ub);
-            }; })(sp.id, unpubBtn);
-            pubLeft.appendChild(pubBadge2);
-            pubLeft.appendChild(unpubBtn);
+        var toggleWrap=document.createElement("div"); toggleWrap.className="pub-toggle-wrap";
+        var lblDraft=document.createElement("span"); lblDraft.className="pub-toggle-lbl"+(sp.published?"":" active"); lblDraft.textContent="Draft";
+        var toggleEl=document.createElement("div"); toggleEl.className="pub-toggle "+(sp.published?"on":"off");
+        var lblPub=document.createElement("span"); lblPub.className="pub-toggle-lbl"+(sp.published?" active":""); lblPub.textContent="Published";
+
+        toggleEl.onclick=(function(sid, tog, ld, lp, spObj){ return function(e){
+          e.stopPropagation();
+          var isNowOn = tog.classList.contains("on");
+          if(isNowOn) {
+            if(!confirm("Unpublish \""+spObj.name+"\"? It will be removed from Release Dates.")) return;
+            tog.classList.remove("on"); tog.classList.add("off");
+            ld.classList.add("active"); lp.classList.remove("active");
+            unpublishSprint(sid, tog);
           } else {
-            var draftBadge = document.createElement("span");
-            draftBadge.className = "draft-badge"; draftBadge.textContent = "Draft";
-            var pubBtn = document.createElement("button");
-            pubBtn.className = "publish-btn";
-            pubBtn.innerHTML = "&#10003; Publish";
-            pubBtn.onclick = (function(sid, pb){ return function(e){
-              e.stopPropagation();
-              if(!confirm("Publish \"" + sp.name + "\" to Release Dates?")) return;
-              publishSprint(sid, pb);
-            }; })(sp.id, pubBtn);
-            pubLeft.appendChild(draftBadge);
-            pubLeft.appendChild(pubBtn);
+            if(!confirm("Publish \""+spObj.name+"\" to Release Dates?")) return;
+            tog.classList.remove("off"); tog.classList.add("on");
+            lp.classList.add("active"); ld.classList.remove("active");
+            publishSprint(sid, tog);
           }
-        }
-        // Delete
-        var db=document.createElement("button"); db.className="entry-del-btn"; db.innerHTML="&times;";
-        db.onclick=function(e){ e.stopPropagation(); deleteSprint(sp.id); };
-        pubRight.appendChild(db);
+        };})(sp.id, toggleEl, lblDraft, lblPub, sp);
+
+        toggleWrap.appendChild(lblDraft); toggleWrap.appendChild(toggleEl); toggleWrap.appendChild(lblPub);
+        pubRow.appendChild(toggleWrap);
       }
 
-      pubRow.appendChild(pubLeft); pubRow.appendChild(pubRight);
       card.appendChild(pubRow);
 
       // Build expand panel — 3-col tabular grid
