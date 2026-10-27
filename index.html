@@ -1204,7 +1204,7 @@ function saveWebhook(t, u) { var w = loadWebhooks(); w[t] = u; try { localStorag
 function pad(n) { return n < 10 ? "0" + n : "" + n; }
 function todayISO() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth()+1) + "-" + pad(n.getDate()); }
 function toISO(d) { return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
-function parseLocal(s) { if(!s) return new Date(NaN); var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function parseLocal(s) { if(!s) return new Date(NaN); if(typeof s !== "string") s = String(s); if(s.indexOf("-") === -1) return new Date(NaN); var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
 function isWeekend(d) { return d.getDay()===0 || d.getDay()===6; }
 function isHoliday(d) {
   var iso = toISO(d);
@@ -2014,7 +2014,7 @@ function renderHistory() {
           var t=document.createElement("div"); t.className="scard-expand-hols-title"; t.textContent=title; c.appendChild(t);
           hols.forEach(function(h){
             var hEl=document.createElement("div"); hEl.className="scard-expand-hol";
-            hEl.textContent="• "+h.label+" — "+fmtMini(parseLocal(h.date)); c.appendChild(hEl);
+            hEl.textContent="• "+h.label+(h.date ? " — "+fmtMini(h.date instanceof Date ? h.date : parseLocal(String(h.date))) : ""); c.appendChild(hEl);
           });
           return c;
         };
