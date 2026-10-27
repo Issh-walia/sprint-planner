@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -22,31 +22,42 @@
       --slack: #4A154B; --slack-hover: #611f64;
       --mono: 'DM Mono', monospace; --display: 'Syne', sans-serif;
     }
-    html, body { background: var(--paper); font-family: var(--display); color: var(--ink); min-height: 100vh; }
-    .wrap { max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    html, body { background: var(--paper); font-family: 'Inter', var(--display), sans-serif; color: var(--ink); min-height: 100vh; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 0 0 4rem; }
 
-    /* ── Header ── */
-    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; gap: 1rem; }
-    .header-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--ink3); text-transform: uppercase; margin-bottom: 6px; }
-    .header-title { font-size: 30px; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -0.03em; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .header-title span { color: var(--sprint-ink); }
-    .header-badge { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 11px; background: var(--sprint-bg); color: var(--sprint-ink); padding: 3px 10px; border-radius: 99px; }
-    .header-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; align-items: flex-end; flex-shrink: 0; }
-    .btn-slack { display: none; align-items: center; gap: 8px; background: var(--slack); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    /* ── Header — green banner ── */
+    .header { background: linear-gradient(135deg, #0a2b16 0%, #1a6b3c 55%, #2a9658 100%); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; gap: 1rem; position: relative; overflow: hidden; border-radius: 0; }
+    .header::before { content: ''; position: absolute; right: -60px; top: -60px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.03); pointer-events: none; }
+    .header-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 3px; }
+    .header-title { font-size: 22px; font-weight: 900; color: #fff; line-height: 1.1; letter-spacing: -0.03em; font-family: 'Inter', sans-serif; text-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .header-title span { color: #a8f0c8; font-weight: 700; }
+    .header-badge { display: none; }
+    .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; position: relative; z-index: 1; }
+    .btn-slack { display: none; align-items: center; gap: 8px; background: var(--slack); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
     .btn-slack:hover { background: var(--slack-hover); }
-    .btn-new-sprint { display: flex; align-items: center; gap: 7px; background: var(--sprint-ink); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .btn-new-sprint { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
     .btn-inline { padding: 7px 12px !important; font-size: 12px !important; border-radius: 8px !important; width: 100%; justify-content: center; margin-bottom: 4px; }
-    .btn-new-sprint:hover { background: #1e2580; }
+    .btn-new-sprint:hover { background: rgba(255,255,255,0.22); }
     .btn-new-sprint:active { transform: scale(0.97); }
-    .btn-save { display: flex; align-items: center; gap: 7px; background: var(--card); color: var(--ink2); border: 1px solid var(--border-strong); border-radius: 10px; padding: 9px 16px; font-family: var(--display); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
-    .btn-save:hover { background: var(--sprint-bg); color: var(--sprint-ink); border-color: var(--sprint-ink); }
+    .btn-save { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .btn-save:hover { background: rgba(255,255,255,0.2); }
+    .lock-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.95); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 20px; padding: 6px 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: #1a6b3c; cursor: pointer; transition: all 0.15s; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+    .lock-btn:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .lock-btn.unlocked { background: #fff; border-color: #fff; color: #1a6b3c; }
+    .lock-btn svg { width: 13px; height: 13px; }
+    .lock-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.4); display: inline-block; transition: all 0.2s; }
+    .lock-dot { width: 7px; height: 7px; border-radius: 50%; background: #9ab8a6; display: inline-block; }
+    .lock-btn.unlocked .lock-dot { background: #16a34a; box-shadow: 0 0 0 2px rgba(22,163,74,0.2); }
 
-    /* ── Tabs ── */
-    .tabs { display: none; gap: 0; margin-bottom: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
+    /* ── Tabs — horizontal nav bar ── */
+    .tabs { display: none; gap: 0; margin-bottom: 1.5rem; background: #fff; border-bottom: 1px solid #e5ede8; padding: 0 28px; border-radius: 0; border: none; }
     .tabs.admin-visible { display: flex; }
-    .tab { flex: 1; padding: 9px 12px; font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink3); text-align: center; cursor: pointer; border-radius: 9px; transition: all 0.15s; letter-spacing: 0.03em; border: none; background: none; }
-    .tab:hover { color: var(--ink2); background: var(--paper); }
-    .tab.active { background: var(--sprint-bg); color: var(--sprint-ink); }
+    .tab { flex: none; padding: 11px 16px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #6b8578; text-align: center; cursor: pointer; border-radius: 0; border-bottom: 2px solid transparent; transition: all 0.15s; border-top: none; border-left: none; border-right: none; background: none; white-space: nowrap; }
+    .tab:hover { color: #2d7a4f; }
+    .tab.active { color: #1a6b3c; border-bottom-color: #1a6b3c; font-weight: 600; }
+
+    /* ── Content wrap ── */
+    .content-wrap { padding: 1.5rem 1.5rem 0; }
 
     /* ── Tab panels ── */
     .tab-panel { display: none; }
@@ -128,7 +139,7 @@
     .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .history-heading { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
     .history-count { font-family: var(--mono); font-size: 11px; background: var(--paper); color: var(--ink3); padding: 3px 10px; border-radius: 99px; border: 1px solid var(--border-strong); }
-    .history-card { background: transparent; border: none; border-radius: 0; overflow: visible; }
+    .history-card { background: transparent; border: none; border-radius: 0; overflow: visible; font-family: 'Inter', sans-serif; }
     .history-empty { padding: 3rem 1.5rem; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--ink3); line-height: 1.8; background: var(--card); border: 1px solid var(--border); border-radius: 14px; }
     .schedule-grid { display: flex; flex-direction: column; gap: 10px; }
     .sprint-entry { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s, border-color 0.15s; }
@@ -176,6 +187,161 @@
 
 
     /* ── Release Dates tab ── */
+    /* ── Consistent page styling across all tabs ── */
+    .page-section-title { font-size: 11px; font-weight: 700; color: #1a6b3c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+    .tab-panel { font-family: 'Inter', var(--display), sans-serif; }
+
+    /* Planner — clean inputs */
+    .config-card { background: #fff; border: 1px solid #e0ebe4; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+    .card-label { font-size: 9px; font-weight: 700; color: #9ab8a6; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+    .config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field label { font-size: 11px; font-weight: 600; color: #4a6558; margin-bottom: 5px; display: block; }
+    .field input[type="date"], .field select, .field input[type="number"] { background: #f8fbf9; border: 1px solid #c8ddd2; border-radius: 8px; padding: 8px 10px; font-size: 13px; color: #0d2618; font-family: 'Inter', sans-serif; width: 100%; outline: none; transition: border 0.15s; }
+    .field input[type="date"]:focus, .field select:focus, .field input[type="number"]:focus { border-color: #1a6b3c; }
+
+    /* ── Planner — matches Release Dates style ── */
+
+    /* Top action bar */
+    .planner-mode-toggle { display: inline-flex; background: #fff; border: 1px solid #c8ddd2; border-radius: 9px; padding: 3px; gap: 2px; }
+    .pmt-btn { padding: 7px 14px; font-size: 12px; font-weight: 500; border-radius: 7px; border: none; background: none; color: #6b8578; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+    .pmt-btn.active-release, .pmt-btn.active-sprint { background: #1a6b3c; color: #fff; }
+    .sab-btn.sab-save { background: #1a6b3c; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.15s; }
+    .sab-btn.sab-save:hover { background: #155c30; }
+    .sab-label { font-size: 12px; }
+
+    /* Config card — matches release card style */
+    .config-card { background: #fff; border: 1px solid #e0ebe4; border-radius: 14px; overflow: hidden; margin-bottom: 12px; }
+    .card-label { font-size: 9px; font-weight: 700; color: #9ab8a6; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 18px; border-bottom: 1px solid #f0f5f1; background: #f8fbf9; }
+    .config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .field { padding: 14px 18px; border-right: 1px solid #f0f5f1; border-bottom: 1px solid #f0f5f1; }
+    .field:nth-child(even) { border-right: none; }
+    .field:nth-last-child(-n+2) { border-bottom: none; }
+    .field label { font-size: 11px; font-weight: 700; color: #1a6b3c; letter-spacing: 0.01em; margin-bottom: 6px; display: block; }
+    .field input[type="date"], .field select, .field input[type="number"] { background: #f8fbf9; border: 1px solid #c8ddd2; border-radius: 8px; padding: 8px 10px; font-size: 13px; color: #0d2618; font-family: 'Inter', sans-serif; width: 100%; outline: none; transition: border 0.15s; font-weight: 600; }
+    .field input[type="date"]:focus, .field select:focus { border-color: #1a6b3c; }
+    .field-note { font-size: 10px; color: #b0c4b8; margin-top: 4px; display: block; }
+
+    /* Timeline bar */
+    .timeline-bar { height: 4px; border-radius: 4px; overflow: hidden; display: flex; margin: 12px 0; gap: 2px; }
+    .tbar-sprint { background: #1a6b3c; opacity: 0.8; }
+    .tbar-reg { background: #0f6a8a; opacity: 0.8; }
+    .tbar-release { background: #b85c00; opacity: 0.8; width: 6px; flex-shrink: 0; }
+
+    /* Phase blocks — match release card style */
+    .phases { display: flex; flex-direction: column; gap: 8px; }
+    .phase-block { background: #fff; border: 1px solid #e0ebe4; border-radius: 14px; overflow: hidden; }
+    .phase-block.has-blocker { border-color: #fca5a5; }
+    .phase-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+    .phase-header-left { display: flex; align-items: center; gap: 8px; }
+    .phase-sprint .phase-header { background: #f0faf4; border-bottom: 1px solid #d4f0de; color: #1a6b3c; }
+    .phase-reg .phase-header { background: #f0f7fa; border-bottom: 1px solid #cce6f0; color: #0f6a8a; }
+    .phase-release .phase-header { background: #fdf7f0; border-bottom: 1px solid #f0dcc8; color: #b85c00; }
+    .phase-sprint .dot { background: #1a6b3c; }
+    .phase-reg .dot { background: #0f6a8a; }
+    .phase-release .dot { background: #b85c00; }
+    /* Milestone rows — clean tabular: label left, date right */
+    .phase-body { display: flex; flex-direction: column; }
+    .milestone-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid #f0f5f1; }
+    .milestone-row:last-child { border-bottom: none; }
+    .milestone-name { font-size: 13px; font-weight: 700; color: #1a6b3c; }
+    .milestone-right { display: flex; align-items: center; gap: 8px; }
+    .milestone-date { font-size: 15px; font-weight: 700; color: #1e3a2a; }
+    .milestone-date.blocked-date { color: #dc2626; }
+    .milestone-sub { font-size: 10px; color: #9ab8a6; }
+
+    /* Blocker banner */
+    .blocker-banner { background: #fff5f5; border: 1px solid #fca5a5; border-radius: 10px; padding: 10px 16px; margin-bottom: 12px; display: none; }
+    .blocker-banner.visible { display: block; }
+    .blocker-banner-title { font-size: 10px; font-weight: 700; color: #dc2626; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+
+    /* Window holidays — subtle strip */
+    .window-holidays { padding: 10px 18px; background: #fffbeb; border-top: 1px solid #fef3c7; display: none; }
+    .window-holidays.visible { display: block; }
+    .wh-title { font-size: 9px; font-weight: 700; color: #92600a; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+    /* Blocker count in header */
+    .blocker-count { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: 700; font-family: 'Inter', sans-serif; }
+    .blocker-count:empty { display: none; }
+
+    /* Sprint schedule toolbar */
+    .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .history-heading { font-size: 11px; font-weight: 700; color: #1a6b3c; text-transform: uppercase; letter-spacing: 0.08em; }
+    .history-count { font-size: 11px; color: #9ab8a6; background: #fff; border: 1px solid #e0ebe4; border-radius: 20px; padding: 3px 10px; }
+
+    /* Holidays toolbar */
+    .holiday-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .holiday-heading { font-size: 11px; font-weight: 700; color: #1a6b3c; text-transform: uppercase; letter-spacing: 0.08em; }
+    .btn-add-holiday { background: #fff; border: 1px solid #c8ddd2; border-radius: 8px; padding: 7px 14px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: #4a6558; cursor: pointer; transition: all 0.15s; }
+    .btn-add-holiday:hover { background: #e8f5ee; color: #1a6b3c; }
+
+    /* Holiday year groups */
+    .holiday-year-group { border: 1px solid #e0ebe4; border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+    .holiday-year-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fbf9; cursor: pointer; user-select: none; }
+    .holiday-year-label { font-size: 13px; font-weight: 700; color: #0d2618; }
+    .holiday-year-count { font-size: 10px; color: #9ab8a6; background: #fff; border: 1px solid #e0ebe4; border-radius: 20px; padding: 2px 8px; }
+    .holiday-year-chevron { font-size: 11px; color: #9ab8a6; transition: transform 0.2s; display: inline-block; }
+    .holiday-year-chevron.open { transform: rotate(180deg); }
+    .holiday-year-body { padding: 10px 12px; background: #fff; }
+    .holiday-year-body.collapsed { display: none; }
+
+    /* Holiday row */
+    .holiday-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f0f5f1; }
+    .holiday-row:last-child { border-bottom: none; }
+    .holiday-row input[type="date"] { background: #f8fbf9; border: 1px solid #c8ddd2; border-radius: 7px; padding: 5px 8px; font-size: 12px; color: #0d2618; font-family: 'Inter', sans-serif; flex-shrink: 0; }
+    .holiday-row input[type="text"] { flex: 1; background: #f8fbf9; border: 1px solid #c8ddd2; border-radius: 7px; padding: 5px 8px; font-size: 12px; color: #0d2618; font-family: 'Inter', sans-serif; }
+    .del-btn { background: none; border: none; color: #c8ddd2; font-size: 16px; cursor: pointer; padding: 0 4px; transition: color 0.15s; }
+    .del-btn:hover { color: #dc2626; }
+
+    /* Meetings section bar */
+    .meetings-section-bar { display: flex; gap: 6px; margin-bottom: 16px; background: #fff; border: 1px solid #e0ebe4; border-radius: 10px; padding: 4px; }
+    .meetings-section-btn { flex: 1; padding: 7px; font-size: 12px; font-weight: 500; color: #9ab8a6; background: none; border: none; border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+    .meetings-section-btn.active { background: #1a6b3c; color: #fff; font-weight: 600; }
+
+    /* ── Release dates — year nav layout ── */
+    .rel-page-title { font-size: 11px; font-weight: 700; color: #1a6b3c; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+    .rel-layout { display: grid; grid-template-columns: 100px 1fr; gap: 0; background: #fff; border: 1px solid #e0ebe4; border-radius: 14px; overflow: hidden; }
+    .rel-year-nav { background: linear-gradient(180deg, #1a6b3c 0%, #124d2b 100%); padding: 10px 0; }
+    .rel-year-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; position: relative; transition: background 0.12s; user-select: none; }
+    .rel-year-item:hover { background: rgba(255,255,255,0.08); }
+    .rel-year-item.active { background: rgba(255,255,255,0.14); }
+    .rel-year-item.active::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 26px; background: #a8f0c8; border-radius: 2px 0 0 2px; }
+    .rel-year-lbl { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.55); }
+    .rel-year-item.active .rel-year-lbl { color: #fff; }
+    .rel-year-dot { width: 5px; height: 5px; border-radius: 50%; background: #a8f0c8; flex-shrink: 0; }
+    .rel-year-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 10px; }
+    .rel-content { padding: 20px; background: #f4f7f5; min-height: 400px; }
+    .rel-year-heading { font-size: 22px; font-weight: 800; color: #0d2618; margin-bottom: 3px; }
+    .rel-year-sub { font-size: 11px; color: #9ab8a6; font-weight: 500; margin-bottom: 16px; }
+
+    /* ── New release card style ── */
+    .rel-card-new { background: #fff; border: 1px solid #e0ebe4; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+    .rel-card-new.active-card { border: 2px solid #1a6b3c; box-shadow: 0 4px 20px rgba(26,107,60,0.14); }
+    .rel-card-new.active-card .rel-card-top { background: #f0faf4; }
+    .rel-card-new.active-card .rel-card-ftr { background: #f4fbf6; }
+    .rel-card-new.past-card { opacity: 0.8; }
+    .rel-card-top { padding: 14px 18px; border-bottom: 1px solid #f0f5f1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .rel-card-name { font-size: 14px; font-weight: 700; color: #0d2618; display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+    .rel-card-sub { font-size: 11px; color: #9ab8a6; }
+    .rel-card-dates { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #f0f5f1; }
+    .rel-date-col { padding: 14px 18px; }
+    .rel-date-col:first-child { border-right: 1px solid #f0f5f1; }
+    .rel-date-region { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9ab8a6; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+    .rel-date-wday { font-size: 10px; color: #b0c4b8; margin-bottom: 2px; }
+    .rel-date-val { font-size: 20px; font-weight: 800; color: #1a6b3c; }
+    .rel-date-val.na { color: #0f5a8a; }
+    .rel-date-val.past { color: #9ab8a6; font-size: 16px; }
+    .rel-card-ftr { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; background: #fafcfb; }
+    .rel-countdown { font-size: 11px; color: #6b8578; font-weight: 500; }
+    .rel-countdown strong { font-size: 18px; font-weight: 900; color: #0d2618; margin-right: 3px; }
+    .rel-card-actions { display: flex; gap: 6px; }
+    .rel-act-btn { height: 30px; border-radius: 8px; display: flex; align-items: center; gap: 5px; padding: 0 10px; font-size: 11px; font-weight: 500; cursor: pointer; background: #fff; border: 1px solid #d4e6da; color: #4a6058; transition: all 0.15s; }
+    .rel-act-btn:hover { background: #e8f5ee; }
+    .rel-new-archive { background: #fff; border: 1.5px dashed #c8ddd2; border-radius: 12px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-top: 4px; transition: all 0.15s; }
+    .rel-new-archive:hover { background: #e8f5ee; border-style: solid; }
+    .rel-archive-left { display: flex; align-items: center; gap: 12px; }
+    .rel-archive-icon { width: 34px; height: 34px; background: #f0faf4; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; border: 1px solid #d4edd9; }
+    .rel-archive-title { font-size: 12px; font-weight: 700; color: #3a5a46; }
+    .rel-archive-sub { font-size: 11px; color: #9ab8a6; margin-top: 1px; }
+
     /* ── Release filter bar ── */
     .release-filter-bar { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
     .release-filter-btn { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--card); color: var(--ink3); cursor: pointer; transition: all 0.15s; }
@@ -279,6 +445,76 @@
     .scrum-placeholder { background: var(--card); border: 1px dashed var(--border-strong); border-radius: 12px; padding: 32px; text-align: center; }
     .scrum-placeholder-title { font-size: 14px; font-weight: 700; color: var(--ink2); margin-bottom: 6px; }
     .scrum-placeholder-sub { font-family: var(--mono); font-size: 11px; color: var(--ink3); }
+
+    /* ── Sprint schedule — tabular card style ── */
+    .sprint-entry { background: #fff; border: 1px solid #e0ebe4; border-radius: 14px; overflow: hidden; margin-bottom: 10px; }
+    .sprint-entry.status-active { border: 2px solid #1a6b3c; }
+    .sprint-entry.status-past { opacity: 0.85; }
+    /* Name row */
+    .scard-name-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; gap: 10px; }
+    .scard-name { font-size: 16px; font-weight: 800; color: #0d2618; cursor: pointer; position: relative; display: inline-block; }
+    .scard-name:hover { color: #1a6b3c; text-decoration: underline; text-decoration-color: #c8ddd2; text-underline-offset: 3px; }
+    /* Hover tooltip */
+    .scard-tooltip { display: none; position: absolute; left: 0; top: calc(100% + 8px); background: #0d2618; color: #fff; border-radius: 10px; padding: 12px 14px; min-width: 260px; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.2); pointer-events: none; }
+    .scard-name:hover .scard-tooltip { display: block; }
+    .scard-tooltip-title { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .scard-tooltip-row { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .scard-tooltip-row:last-child { border-bottom: none; }
+    .scard-tooltip-lbl { color: rgba(255,255,255,0.55); }
+    .scard-tooltip-val { font-weight: 600; color: #fff; }
+    .scard-tooltip-hol { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #fcd34d; }
+    /* Expand panel */
+    /* Chevron toggle button */
+    .scard-chevron { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #c8ddd2; background: #f4f7f5; color: #6b8578; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .scard-chevron.open { background: #1a6b3c; border-color: #1a6b3c; color: #fff; transform: rotate(180deg); }
+    /* Expand panel */
+    .scard-expand { display: none; border-top: 2px solid #e0ebe4; background: #f8fbf9; }
+    .scard-expand.open { display: block; }
+    /* 3-column grid */
+    .scard-expand-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid #e0ebe4; }
+    .scard-expand-col { padding: 14px 18px; border-right: 1px solid #e0ebe4; }
+    .scard-expand-col:last-child { border-right: none; }
+    .scard-expand-lbl { font-size: 9px; font-weight: 700; color: #9ab8a6; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px; border-bottom: 2px solid #e0ebe4; margin-bottom: 10px; }
+    .scard-expand-lbl.sprint { border-color: #1a6b3c; color: #1a6b3c; }
+    .scard-expand-lbl.reg { border-color: #0f6a8a; color: #0f6a8a; }
+    .scard-expand-lbl.rel { border-color: #b85c00; color: #b85c00; }
+    /* Tabular rows */
+    .scard-expand-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f5f1; }
+    .scard-expand-row:last-child { border-bottom: none; }
+    .scard-expand-key { font-size: 12px; font-weight: 600; color: #1a6b3c; }
+    .scard-expand-val { font-size: 13px; font-weight: 700; color: #1e3a2a; }
+    /* Holidays section */
+    .scard-expand-hols { padding: 12px 18px; background: #fffbeb; }
+    .scard-expand-hols-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; margin-top: 8px; }
+    .scard-expand-hols-col { padding: 0 12px 0 0; }
+    .scard-expand-hols-col:first-child { padding-left: 0; }
+    .scard-expand-hols-title { font-size: 9px; font-weight: 700; color: #92600a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .scard-expand-hol { font-size: 11px; color: #92600a; padding: 2px 0; }
+    .scard-name-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .scard-sub { font-size: 11px; color: #9ab8a6; padding: 3px 20px 14px; }
+    /* Status pill */
+    .entry-status { font-size: 11px; font-weight: 600; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
+    .entry-status.status-active { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .entry-status.status-upcoming { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+    .entry-status.status-past { background: #f4f6f4; color: #6b8578; border: 1px solid #d4e0d4; }
+    /* Date table */
+    .scard-date-table { border-top: 1px solid #f0f5f1; }
+    .scard-dt-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 20px; border-bottom: 1px solid #f0f5f1; }
+    .scard-dt-row:last-child { border-bottom: none; }
+    .scard-dt-lbl { font-size: 13px; font-weight: 700; color: #1a6b3c; }
+    .scard-dt-val { font-size: 15px; font-weight: 700; color: #1e3a2a; }
+    .scard-dt-val.eu { color: #1a6b3c; }
+    .scard-dt-val.na { color: #0f5a8a; }
+    .scard-dt-val.muted { color: #9ab8a6; font-size: 13px; }
+    /* Pub row */
+    .scard-pub-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: #fafcfb; border-top: 1px solid #f0f5f1; }
+    .scard-pub-left { display: flex; align-items: center; gap: 8px; }
+    /* Edit btn */
+    .entry-edit-btn { font-size: 11px; font-weight: 600; color: #4a6058; background: #fff; border: 1px solid #c8ddd2; border-radius: 8px; padding: 3px 12px; cursor: pointer; display: none; }
+    .entry-edit-btn.visible { display: inline-flex; align-items: center; gap: 5px; }
+    /* Del btn */
+    .entry-del-btn { background: none; border: 1px solid #e0ebe4; border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: #c8ddd2; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
+    .entry-del-btn:hover { background: #fff0f0; border-color: #fca5a5; color: #dc2626; }
 
     /* ── Schedule section dividers ── */
     .schedule-section-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0 8px; }
@@ -427,7 +663,7 @@
     /* ── Lock / Admin mode ── */
     .lock-btn { display: flex; align-items: center; gap: 6px; background: none; border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 14px; font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--ink3); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .lock-btn:hover { background: var(--paper); color: var(--ink2); }
-    .lock-btn.unlocked { background: var(--reg-bg); color: var(--reg-ink); border-color: var(--reg-ink); }
+    /* lock-btn.unlocked handled in header CSS */
     .lock-btn svg { width: 14px; height: 14px; }
     .pin-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(14,14,15,0.5); align-items: center; justify-content: center; z-index: 2000; }
     .pin-modal-overlay.open { display: flex; }
@@ -476,11 +712,12 @@
     .pmt-btn.active-sprint { background: var(--reg-ink); color: #fff; }
     .sprint-only-note { background: var(--reg-bg); border: 1px solid var(--reg-ink); border-radius: 10px; padding: 10px 14px; font-family: var(--mono); font-size: 12px; color: var(--reg-ink); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
     /* ── Drag & drop ── */
-    .drag-handle { display: flex; align-items: center; justify-content: center; width: 24px; height: 36px; cursor: grab; color: var(--ink3); flex-shrink: 0; border-radius: 6px; transition: background 0.12s; user-select: none; }
-    .drag-handle:hover { background: var(--paper); color: var(--ink2); }
+    .drag-handle { display: flex; align-items: center; justify-content: center; width: 24px; height: 36px; cursor: grab; color: #c8ddd2; flex-shrink: 0; border-radius: 6px; transition: all 0.12s; user-select: none; }
+    .drag-handle:hover { color: #1a6b3c; background: #e8f5ee; }
     .drag-handle:active { cursor: grabbing; }
     .drag-handle svg { pointer-events: none; }
-    .sprint-entry.dragging { opacity: 0.4; border: 2px dashed var(--sprint-ink); }
+    .sprint-entry.dragging { opacity: 0.5; }
+    .sprint-entry.drag-over { border-color: #1a6b3c !important; box-shadow: 0 0 0 2px rgba(26,107,60,0.2); }    .sprint-entry.dragging { opacity: 0.4; border: 2px dashed var(--sprint-ink); }
     .sprint-entry.drag-over { border-color: var(--sprint-ink); background: var(--sprint-bg); transform: scale(1.01); box-shadow: 0 4px 20px rgba(45,53,168,0.15); }
     .sprint-entry { transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
 
@@ -505,14 +742,13 @@
 
   <!-- Header -->
   <div class="header">
-    <div>
-
+    <div style="position:relative;z-index:1;">
+      <div class="header-eyebrow">Release planning</div>
       <div class="header-title">Sprint <span>Planner</span></div>
-
     </div>
     <div class="header-actions">
       <button class="lock-btn" id="lockBtn" onclick="openPinModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="lock-dot" id="lockDot"></span>
         <span id="lockBtnText">Admin</span>
       </button>
       <button class="btn-slack" onclick="openSlackModal(null)">
@@ -531,9 +767,11 @@
     <button class="tab" onclick="switchTab('meetings')">Meetings</button>
     <button class="tab" onclick="switchTab('holidays')">Holidays</button>
   </div>
+  <div class="content-wrap">
 
   <!-- ── TAB: Planner ── -->
   <div class="tab-panel active" id="tab-planner">
+    <div class="page-section-title">Planner</div>
     <div class="blocker-banner" id="blockerBanner">
       <div class="blocker-banner-title">🚫 Holiday blockers detected</div>
       <div class="blocker-list" id="blockerList"></div>
@@ -553,8 +791,7 @@
       </button>
     </div>
     <div class="config-card">
-      <div class="card-label">Configuration</div>
-      <div class="config-row">
+      <div class="config-row" style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
         <div class="field">
           <label>Sprint start date</label>
           <input type="date" id="sprintStart" oninput="calculate()" />
@@ -607,7 +844,7 @@
 
     <div class="phases">
       <div class="phase-block phase-sprint" id="blockSprint">
-        <div class="phase-header"><span class="dot"></span> Sprint <span class="blocker-count" id="bcSprint"></span></div>
+        <div class="phase-header"><div class="phase-header-left"><span class="dot"></span> Sprint</div><span class="blocker-count" id="bcSprint"></span></div>
         <div class="phase-body">
           <div class="milestone-row" id="rowSprintStart">
             <span class="milestone-name">Start</span>
@@ -626,7 +863,7 @@
       </div>
 
       <div class="phase-block phase-reg" id="blockReg">
-        <div class="phase-header"><span class="dot"></span> Regression <span class="blocker-count" id="bcReg"></span></div>
+        <div class="phase-header"><div class="phase-header-left"><span class="dot"></span> Regression</div><span class="blocker-count" id="bcReg"></span></div>
         <div class="phase-body">
           <div class="milestone-row" id="rowRegStart">
             <span class="milestone-name">Reg start</span>
@@ -641,7 +878,7 @@
       </div>
 
       <div class="phase-block phase-release" id="blockRelease">
-        <div class="phase-header"><span class="dot"></span> Release <span class="blocker-count" id="bcRelease"></span></div>
+        <div class="phase-header"><div class="phase-header-left"><span class="dot"></span> Release</div><span class="blocker-count" id="bcRelease"></span></div>
         <div class="phase-body">
           <div class="milestone-row" id="rowEuRelease">
             <span class="milestone-name">EU release</span>
@@ -663,7 +900,7 @@
   <div class="tab-panel" id="tab-history">
     <div class="history-toolbar">
       <span class="history-heading">Sprint schedule</span>
-      <span class="history-count" id="historyCount">0 sprints</span>
+      <span class="history-count" id="historyCount"></span>
     </div>
     <div class="history-card">
       <div id="historyBody">
@@ -674,12 +911,10 @@
 
   <!-- ── TAB: Release Dates ── -->
   <div class="tab-panel" id="tab-releases">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Release dates</span>
-    </div>
-
-    <div class="history-card">
-      <div id="releaseBody">
+    <div class="rel-page-title">Release dates</div>
+    <div class="rel-layout">
+      <div class="rel-year-nav" id="relYearNav"><!-- populated by JS --></div>
+      <div class="rel-content" id="releaseBody">
         <div class="history-empty" id="releaseEmpty">No release dates yet.<br>Save a sprint in the Planner tab to populate this list automatically.</div>
       </div>
     </div>
@@ -687,9 +922,7 @@
 
   <!-- ── TAB: Meetings ── -->
   <div class="tab-panel" id="tab-meetings">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-      <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;font-family:var(--mono);">Meetings</span>
-    </div>
+    <div class="page-section-title">Meetings</div>
     <div class="meetings-section-bar">
       <button class="meetings-section-btn active" id="meetBtnRelease" onclick="switchMeetingSection('release')">Release meetings</button>
       <button class="meetings-section-btn" id="meetBtnScrum" onclick="switchMeetingSection('scrum')">Scrum ceremonies</button>
@@ -795,6 +1028,8 @@
   </div>
 </div>
 
+  </div><!-- end content-wrap -->
+
 <!-- Year Picker Modal -->
 <div class="year-picker-overlay" id="yearPickerOverlay" onclick="if(event.target===this)closeYearPicker()">
   <div class="year-picker-modal">
@@ -844,9 +1079,23 @@ function sbFetch(path, options) {
 function dbLoadSprints(callback) {
   sbFetch("sprints?select=*&order=sprint_start.asc", {
     method: "GET", headers: sbHeaders()
-  }).then(function(r){ return r.json(); })
-    .then(function(data){ callback(data || []); })
-    .catch(function(){ callback([]); });
+  }).then(function(r){
+    return r.json();
+  })
+    .then(function(data){
+      if(!Array.isArray(data)){
+        console.error("Supabase returned non-array:", data);
+        callback([]);
+        return;
+      }
+      callback(data);
+    })
+    .catch(function(err){
+      console.error("dbLoadSprints failed:", err);
+      // Try loading from localStorage as fallback
+      var local = loadSprints();
+      callback(local || []);
+    });
 }
 
 function dbSaveSprint(sprint, callback) {
@@ -955,7 +1204,7 @@ function saveWebhook(t, u) { var w = loadWebhooks(); w[t] = u; try { localStorag
 function pad(n) { return n < 10 ? "0" + n : "" + n; }
 function todayISO() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth()+1) + "-" + pad(n.getDate()); }
 function toISO(d) { return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
-function parseLocal(s) { var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function parseLocal(s) { if(!s) return new Date(NaN); var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
 function isWeekend(d) { return d.getDay()===0 || d.getDay()===6; }
 function isHoliday(d) {
   var iso = toISO(d);
@@ -997,7 +1246,7 @@ function holidaysInRange(s,e) {
 }
 function fmt(d) { return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); }
 function fmtShort(d) { return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
-function fmtMini(d) { return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
+function fmtMini(d) { if(!d||isNaN(d.getTime())) return "—"; return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
 function el(id) { return document.getElementById(id); }
 
 /* ── Tab switching ── */
@@ -1529,7 +1778,9 @@ function removeHoliday(i){ holidays.splice(i,1); renderHolidays(); calculate(); 
 /* ── Sprint Schedule tab ── */
 function sprintStatus(startISO, endISO) {
   var today=new Date(); today.setHours(0,0,0,0);
+  if(!startISO || !endISO) return {label:"Upcoming",cls:"status-upcoming"};
   var s=parseLocal(startISO), e=parseLocal(endISO);
+  if(!s || !e || isNaN(s.getTime()) || isNaN(e.getTime())) return {label:"Upcoming",cls:"status-upcoming"};
   if(e<today) return {label:"Past",cls:"status-past"};
   if(s<=today && today<=e) return {label:"Active",cls:"status-active"};
   return {label:"Upcoming",cls:"status-upcoming"};
@@ -1538,7 +1789,7 @@ function sprintStatus(startISO, endISO) {
 function renderHistory() {
   var body=el("historyBody"), empty=el("historyEmpty"), count=el("historyCount");
   if(!body) return;
-  if(count) count.textContent = "Loading...";
+  if(count) count.textContent = "Loading…";
   dbLoadSprints(function(sprints) {
   // normalize field names from Supabase snake_case to camelCase
   sprints = sprints.map(function(s){ return {
@@ -1569,10 +1820,11 @@ function renderHistory() {
   var today0=new Date(); today0.setHours(0,0,0,0);
   var activeGroup=[], upcomingGroup=[], pastGroup=[];
   sorted.forEach(function(sp){
-    var st=sprintStatus(sp.sprintStart,sp.sprintEnd);
-    if(st.label==="Active") activeGroup.push(sp);
-    else if(st.label==="Upcoming") upcomingGroup.push(sp);
-    else pastGroup.push(sp);
+    var spStart=parseLocal(sp.sprintStart);
+    var euRel=sp.euRelease?parseLocal(sp.euRelease):parseLocal(sp.sprintEnd);
+    if(euRel < today0) pastGroup.push(sp);
+    else if(spStart <= today0 && euRel >= today0) activeGroup.push(sp);
+    else upcomingGroup.push(sp);
   });
 
   // Sort past by date descending (most recent first)
@@ -1594,241 +1846,198 @@ function renderHistory() {
   }
 
   function buildSprintCard(sp) {
-    (function(sp){
-      var status=sprintStatus(sp.sprintStart,sp.sprintEnd);
+    var status=sprintStatus(sp.sprintStart,sp.sprintEnd);
 
       // Card wrapper
-      var card=document.createElement("div"); card.className="sprint-entry"; card.dataset.id=sp.id;
+      var card=document.createElement("div");
+      card.className="sprint-entry";
+      if(status.label==="Active") card.classList.add("status-active");
+      if(status.label==="Past") card.classList.add("status-past");
+      card.dataset.id=sp.id;
 
-      // ── Top row ──
-      var top=document.createElement("div"); top.className="entry-top";
-      top.onclick=function(){ toggleExpand(card,sp); };
-
-      var topLeft=document.createElement("div"); topLeft.className="entry-top-left";
-
-      // Drag handle
-      var dragHandle=document.createElement("div"); dragHandle.className="drag-handle";
-      dragHandle.title="Drag to reorder";
-      dragHandle.innerHTML='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
-      dragHandle.addEventListener("mousedown", function(e){ e.stopPropagation(); });
-
-      var chev=document.createElement("div"); chev.className="entry-chevron"; chev.innerHTML="&#8964;";
-
-      var info=document.createElement("div"); info.className="entry-info";
-      var nameEl=document.createElement("div"); nameEl.className="entry-name";
+      // ── Name row ──
+      var nameRow=document.createElement("div"); nameRow.className="scard-name-row";
+      var chevBtn=document.createElement("button"); chevBtn.className="scard-chevron"; chevBtn.innerHTML="▾";
+      var nameEl=document.createElement("div"); nameEl.className="scard-name";
       var nameText=document.createElement("span"); nameText.textContent=sp.name;
-      var editNameBtn=document.createElement("button"); editNameBtn.className="entry-name-edit-btn";
-      editNameBtn.title="Rename sprint";
-      editNameBtn.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-      if(isAdmin()) editNameBtn.style.display="inline-flex";
-      else editNameBtn.style.display="none";
-      editNameBtn.onclick=(function(sid, sname, nt){ return function(e){
-        e.stopPropagation();
-        var newName = prompt("Rename sprint:", sname);
-        if(!newName || !newName.trim() || newName.trim()===sname) return;
-        dbSaveSprint({id:sid, name:newName.trim()}, function(){
-          nt.textContent = newName.trim();
-          showToast("Sprint renamed!");
-        });
-      }; })(sp.id, sp.name, nameText);
-      nameEl.appendChild(nameText); nameEl.appendChild(editNameBtn);
-      var meta=document.createElement("div"); meta.className="entry-meta";
-      var datesEl=document.createElement("span"); datesEl.className="entry-dates";
-      datesEl.textContent=fmtMini(parseLocal(sp.sprintStart))+" → "+fmtMini(parseLocal(sp.sprintEnd));
+
+      // Build hover tooltip
+      var tooltip=document.createElement("div"); tooltip.className="scard-tooltip";
+      var ttRow=function(lbl,val){ var r=document.createElement("div"); r.className="scard-tooltip-row"; r.innerHTML='<span class="scard-tooltip-lbl">'+lbl+'</span><span class="scard-tooltip-val">'+val+'</span>'; return r; };
+      var ttTitle=document.createElement("div"); ttTitle.className="scard-tooltip-title"; ttTitle.textContent="Sprint dates";
+      tooltip.appendChild(ttTitle);
+      if(sp.sprintStart) tooltip.appendChild(ttRow("Sprint start", fmtMini(parseLocal(sp.sprintStart))));
+      if(sp.featureFreeze) tooltip.appendChild(ttRow("Feature freeze", fmtMini(parseLocal(sp.featureFreeze))));
+      if(sp.sprintEnd) tooltip.appendChild(ttRow("Sprint end", fmtMini(parseLocal(sp.sprintEnd))));
+      if(sp.regStart) tooltip.appendChild(ttRow("Reg start", fmtMini(parseLocal(sp.regStart))));
+      if(sp.regEnd) tooltip.appendChild(ttRow("Reg end", fmtMini(parseLocal(sp.regEnd))));
+      if(sp.euRelease) tooltip.appendChild(ttRow("🇪🇺 EU Release", fmtMini(parseLocal(sp.euRelease))));
+      if(sp.naRelease) tooltip.appendChild(ttRow("🇺🇸 NA Release", fmtMini(parseLocal(sp.naRelease))));
+      // Holidays
+      var holsInRange = typeof holidaysInRange === "function" && sp.sprintStart && sp.naRelease
+        ? holidaysInRange(parseLocal(sp.sprintStart), parseLocal(sp.naRelease)) : [];
+      if(holsInRange.length > 0) {
+        var ttHol=document.createElement("div"); ttHol.className="scard-tooltip-hol";
+        ttHol.textContent="⚠ "+holsInRange.length+" holiday"+(holsInRange.length!==1?"s":"")+" in this sprint";
+        tooltip.appendChild(ttHol);
+      }
+      nameEl.appendChild(nameText); nameEl.appendChild(tooltip);
+      var nameRight=document.createElement("div"); nameRight.className="scard-name-right";
       var statusEl=document.createElement("span"); statusEl.className="entry-status "+status.cls; statusEl.textContent=status.label;
-      meta.appendChild(datesEl); meta.appendChild(statusEl);
-      info.appendChild(nameEl); info.appendChild(meta);
-      topLeft.appendChild(dragHandle); topLeft.appendChild(chev); topLeft.appendChild(info);
+      nameRight.appendChild(statusEl);
 
-      // Actions
-      var actions=document.createElement("div"); actions.className="entry-actions";
-
+      // Edit btn (upcoming only)
       var eb=document.createElement("button"); eb.className="entry-edit-btn";
-      eb.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit';
+      eb.innerHTML='✎ Edit';
       if(status.label==="Upcoming" && isAdmin()) eb.classList.add("visible");
       eb.onclick=function(e){ e.stopPropagation(); editSprint(sp.id); };
+      nameRight.appendChild(eb);
 
-      var sb=document.createElement("button"); sb.className="entry-send-btn";
-      sb.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg> Send';
-      sb.onclick=function(e){ e.stopPropagation(); openSlackModal(sp.id); };
+      var dragHandle=document.createElement("div"); dragHandle.className="drag-handle";
+      dragHandle.innerHTML='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
+      dragHandle.addEventListener("mousedown", function(e){ e.stopPropagation(); });
+      nameRow.appendChild(dragHandle); nameRow.appendChild(chevBtn); nameRow.appendChild(nameEl); nameRow.appendChild(nameRight);
+      card.appendChild(nameRow);
 
-      var db=document.createElement("button"); db.className="entry-del-btn"; db.innerHTML="&times;";
-      db.onclick=function(e){ e.stopPropagation(); deleteSprint(sp.id); };
-      if(!isAdmin()) db.style.display="none";
+      // Sub
+      var subEl=document.createElement("div"); subEl.className="scard-sub";
+      subEl.textContent=fmtMini(parseLocal(sp.sprintStart))+" → "+fmtMini(parseLocal(sp.sprintEnd));
+      card.appendChild(subEl);
 
-      // Copy button for sprint card
-      var copySpBtn = document.createElement("button");
-      copySpBtn.className = "copy-btn";
-      copySpBtn.title = "Copy dates";
-      copySpBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-      copySpBtn.onclick = (function(s){ return function(e){
-        e.stopPropagation();
-        var lines = ["*" + s.name + "*", "----------------------------"];
-        lines.push("Start:           " + fmtMini(parseLocal(s.sprintStart)));
-        lines.push("Feature Freeze:  " + fmtMini(parseLocal(s.featureFreeze)));
-        lines.push("Sprint End:      " + fmtMini(parseLocal(s.sprintEnd)));
-        if(s.regStart)   lines.push("Reg Start:       " + fmtMini(parseLocal(s.regStart)));
-        if(s.regEnd)     lines.push("Reg End:         " + fmtMini(parseLocal(s.regEnd)));
-        if(s.euRelease)  lines.push("EU Release:      " + fmtMini(parseLocal(s.euRelease)));
-        if(s.naRelease)  lines.push("NA Release:      " + fmtMini(parseLocal(s.naRelease)));
-        copyToClipboard(lines.join("\n"), copySpBtn);
-      }; })(sp);
+      // No always-visible date table — dates shown in expand panel only
 
-      // Copy card as image for sprint schedule
-      var copyImgSpBtn = document.createElement("button");
-      copyImgSpBtn.className = "copy-btn";
-      copyImgSpBtn.title = "Copy card as image";
-      copyImgSpBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>';
-      copyImgSpBtn.onclick = (function(cardEl, spName, b){ return function(e){
-        e.stopPropagation();
-        // Expand card first if not expanded
-        var wasExpanded = cardEl.classList.contains("expanded");
-        if(!wasExpanded) cardEl.classList.add("expanded");
-        setTimeout(function(){
-          copyCardAsImage(cardEl, spName, b);
-          if(!wasExpanded) setTimeout(function(){ cardEl.classList.remove("expanded"); }, 2500);
-        }, 150);
-      }; })(card, sp.name, copyImgSpBtn);
+      // ── Pub row ──
+      var pubRow=document.createElement("div"); pubRow.className="scard-pub-row";
+      var pubLeft=document.createElement("div"); pubLeft.className="scard-pub-left";
+      var pubRight=document.createElement("div"); pubRight.style.cssText="display:flex;align-items:center;gap:6px;";
 
-      actions.appendChild(copySpBtn); actions.appendChild(copyImgSpBtn);
+      var right=document.createElement("div"); // keep for compat
 
-      // Publish / Unpublish buttons (admin only)
+      // Publish controls in pubLeft/pubRight
       if(isAdmin()) {
         if(status.label === "Past") {
-          // Past sprints — show badge only, no action buttons
           var pubBadge = document.createElement("span");
-          if(sp.published) {
-            pubBadge.className = "published-badge";
-            pubBadge.innerHTML = '&#10003; Published';
-          } else {
-            pubBadge.className = "draft-badge";
-            pubBadge.textContent = "Draft";
-          }
-          actions.appendChild(pubBadge);
+          pubBadge.className = sp.published ? "published-badge" : "draft-badge";
+          pubBadge.innerHTML = sp.published ? "&#10003; Published" : "Draft";
+          pubLeft.appendChild(pubBadge);
         } else {
-          // Active and Upcoming — show full publish/unpublish controls
           if(sp.published) {
             var pubBadge2 = document.createElement("span");
             pubBadge2.className = "published-badge";
-            pubBadge2.innerHTML = '&#10003; Published';
+            pubBadge2.innerHTML = "&#10003; Published";
             var unpubBtn = document.createElement("button");
             unpubBtn.className = "unpublish-btn";
-            unpubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Unpublish';
+            unpubBtn.innerHTML = "&#x2715; Unpublish";
             unpubBtn.onclick = (function(sid, ub){ return function(e){
               e.stopPropagation();
-              if(!confirm("Unpublish \"" + sp.name + "\"? It will be removed from Release Dates and only visible to admins.")) return;
+              if(!confirm("Unpublish \"" + sp.name + "\"?")) return;
               unpublishSprint(sid, ub);
             }; })(sp.id, unpubBtn);
-            actions.appendChild(pubBadge2);
-            actions.appendChild(unpubBtn);
+            pubLeft.appendChild(pubBadge2);
+            pubRight.appendChild(unpubBtn);
           } else {
             var draftBadge = document.createElement("span");
-            draftBadge.className = "draft-badge";
-            draftBadge.textContent = "Draft";
+            draftBadge.className = "draft-badge"; draftBadge.textContent = "Draft";
             var pubBtn = document.createElement("button");
             pubBtn.className = "publish-btn";
-            pubBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publish';
+            pubBtn.innerHTML = "&#10003; Publish";
             pubBtn.onclick = (function(sid, pb){ return function(e){
               e.stopPropagation();
-              if(!confirm("Publish \"" + sp.name + "\" to Release Dates? This will make it visible to everyone.")) return;
+              if(!confirm("Publish \"" + sp.name + "\" to Release Dates?")) return;
               publishSprint(sid, pb);
             }; })(sp.id, pubBtn);
-            actions.appendChild(draftBadge);
-            actions.appendChild(pubBtn);
+            pubLeft.appendChild(draftBadge);
+            pubRight.appendChild(pubBtn);
           }
         }
+        // Delete
+        var db=document.createElement("button"); db.className="entry-del-btn"; db.innerHTML="&times;";
+        db.onclick=function(e){ e.stopPropagation(); deleteSprint(sp.id); };
+        pubRight.appendChild(db);
       }
 
-      actions.appendChild(eb); actions.appendChild(sb); actions.appendChild(db);
-      top.appendChild(topLeft); top.appendChild(actions);
+      pubRow.appendChild(pubLeft); pubRow.appendChild(pubRight);
+      card.appendChild(pubRow);
 
-      // ── Expanded dates panel ──
-      var panel=document.createElement("div"); panel.className="entry-dates-panel";
-      var sections=document.createElement("div"); sections.className="dp-sections";
+      // Build expand panel — 3-col tabular grid
+      var expandPanel=document.createElement("div"); expandPanel.className="scard-expand";
 
-      // Sprint section
-      var secS=document.createElement("div"); secS.className="dp-section sec-sprint";
-      secS.innerHTML=
-        '<div class="dp-section-label">Sprint</div>'+
-        '<div class="dp-row"><div class="dp-lbl">Start</div><div class="dp-val">'+fmtMini(parseLocal(sp.sprintStart))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">Feature freeze</div><div class="dp-val">'+fmtMini(parseLocal(sp.featureFreeze))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">End</div><div class="dp-val">'+fmtMini(parseLocal(sp.sprintEnd))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">Duration</div><div class="dp-val">'+sp.sd+' days</div></div>';
+      var makeTabRow=function(key, val) {
+        var r=document.createElement("div"); r.className="scard-expand-row";
+        r.innerHTML='<span class="scard-expand-key">'+key+'</span><span class="scard-expand-val">'+val+'</span>';
+        return r;
+      };
 
-      // Regression section
-      var secR=document.createElement("div"); secR.className="dp-section sec-reg";
-      secR.innerHTML=
-        '<div class="dp-section-label">Regression</div>'+
-        '<div class="dp-row"><div class="dp-lbl">Start</div><div class="dp-val">'+fmtMini(parseLocal(sp.regStart))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">End</div><div class="dp-val">'+fmtMini(parseLocal(sp.regEnd))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">Duration</div><div class="dp-val">'+sp.rd+' days</div></div>';
+      // Expand grid (renamed to avoid conflict with outer schedule grid)
+      var expGrid=document.createElement("div"); expGrid.className="scard-expand-grid";
 
-      // Release section
-      var secRel=document.createElement("div"); secRel.className="dp-section sec-release";
-      secRel.innerHTML=
-        '<div class="dp-section-label">Release</div>'+
-        '<div class="dp-row"><div class="dp-lbl">EU release</div><div class="dp-val">'+fmtMini(parseLocal(sp.euRelease))+'</div></div>'+
-        '<div class="dp-row"><div class="dp-lbl">NA release</div><div class="dp-val">'+fmtMini(parseLocal(sp.naRelease))+'</div></div>';
+      // Sprint col
+      var spCol=document.createElement("div"); spCol.className="scard-expand-col";
+      var spLbl=document.createElement("div"); spLbl.className="scard-expand-lbl sprint"; spLbl.textContent="Sprint";
+      spCol.appendChild(spLbl);
+      if(sp.sprintStart) spCol.appendChild(makeTabRow("Start", fmtMini(parseLocal(sp.sprintStart))));
+      if(sp.featureFreeze) spCol.appendChild(makeTabRow("Feature freeze", fmtMini(parseLocal(sp.featureFreeze))));
+      if(sp.sprintEnd) spCol.appendChild(makeTabRow("End", fmtMini(parseLocal(sp.sprintEnd))));
+      if(sp.sd) spCol.appendChild(makeTabRow("Duration", sp.sd+" days"));
 
-      sections.appendChild(secS); sections.appendChild(secR); sections.appendChild(secRel);
-      panel.appendChild(sections);
+      // Regression col
+      var regCol=document.createElement("div"); regCol.className="scard-expand-col";
+      var regLbl=document.createElement("div"); regLbl.className="scard-expand-lbl reg"; regLbl.textContent="Regression";
+      regCol.appendChild(regLbl);
+      if(sp.regStart) regCol.appendChild(makeTabRow("Start", fmtMini(parseLocal(sp.regStart))));
+      if(sp.regEnd) regCol.appendChild(makeTabRow("End", fmtMini(parseLocal(sp.regEnd))));
+      if(sp.rd) regCol.appendChild(makeTabRow("Duration", sp.rd+" days"));
 
-      // Holiday alerts within this sprint's windows
-      var spStart = parseLocal(sp.sprintStart);
-      var spEnd   = parseLocal(sp.sprintEnd);
-      var rgStart = parseLocal(sp.regStart);
-      var rgEnd   = parseLocal(sp.regEnd);
-      var euDate  = parseLocal(sp.euRelease);
-      var naDate  = parseLocal(sp.naRelease);
+      // Release col
+      var relCol=document.createElement("div"); relCol.className="scard-expand-col";
+      var relLbl=document.createElement("div"); relLbl.className="scard-expand-lbl rel"; relLbl.textContent="Release";
+      relCol.appendChild(relLbl);
+      if(sp.euRelease) relCol.appendChild(makeTabRow("🇪🇺 EU Release", fmtMini(parseLocal(sp.euRelease))));
+      if(sp.naRelease) relCol.appendChild(makeTabRow("🇺🇸 NA Release", fmtMini(parseLocal(sp.naRelease))));
 
-      var sprintHols  = holidaysInRange(spStart, spEnd);
-      var regHols     = holidaysInRange(rgStart, rgEnd);
-      var releaseHols = getReleaseHolidayAlerts(euDate, naDate);
+      expGrid.appendChild(spCol); expGrid.appendChild(regCol); expGrid.appendChild(relCol);
+      expandPanel.appendChild(expGrid);
 
-      if(sprintHols.length > 0 || regHols.length > 0 || releaseHols.length > 0) {
-        var holStrip = document.createElement("div");
-        holStrip.className = "sched-hol-strip";
+      // Holidays section
+      var sprintHols = typeof holidaysInRange==="function" && sp.sprintStart && sp.sprintEnd ? holidaysInRange(parseLocal(sp.sprintStart), parseLocal(sp.sprintEnd)) : [];
+      var regHols = typeof holidaysInRange==="function" && sp.regStart && sp.regEnd ? holidaysInRange(parseLocal(sp.regStart), parseLocal(sp.regEnd)) : [];
+      var relHols = typeof holidaysInRange==="function" && sp.euRelease && sp.naRelease ? holidaysInRange(parseLocal(sp.euRelease), parseLocal(sp.naRelease)) : [];
 
-        var holTitle = document.createElement("div");
-        holTitle.className = "sched-hol-title";
-        holTitle.innerHTML = "&#9888; Holidays";
-        holStrip.appendChild(holTitle);
+      if(sprintHols.length > 0 || regHols.length > 0 || relHols.length > 0) {
+        var holSec=document.createElement("div"); holSec.className="scard-expand-hols";
+        var holTitle=document.createElement("div"); holTitle.className="scard-expand-hols-title"; holTitle.textContent="⚠ Holidays";
+        holSec.appendChild(holTitle);
+        var holExpGrid=document.createElement("div"); holExpGrid.className="scard-expand-hols-grid";
 
-        var holGrid = document.createElement("div");
-        holGrid.className = "sched-hol-grid";
+        var makeHolCol=function(title, hols) {
+          var c=document.createElement("div"); c.className="scard-expand-hols-col";
+          var t=document.createElement("div"); t.className="scard-expand-hols-title"; t.textContent=title; c.appendChild(t);
+          hols.forEach(function(h){
+            var hEl=document.createElement("div"); hEl.className="scard-expand-hol";
+            hEl.textContent="• "+h.label+" — "+fmtMini(parseLocal(h.date)); c.appendChild(hEl);
+          });
+          return c;
+        };
 
-        // Helper to add a group
-        function addHolGroup(label, hols, colorCls) {
-          if(hols.length === 0) return;
-          var group = document.createElement("div");
-          group.className = "sched-hol-group";
-          var glbl = document.createElement("div");
-          glbl.className = "sched-hol-group-label " + colorCls;
-          glbl.textContent = label;
-          group.appendChild(glbl);
-          for(var hi = 0; hi < hols.length; hi++) {
-            var h = hols[hi];
-            var hrow = document.createElement("div");
-            hrow.className = "sched-hol-row";
-            var dot = document.createElement("span"); dot.className = "sched-hol-dot";
-            var txt = document.createElement("span");
-            var hdate = h.date ? fmtShort(h.date) : fmtShort(h.date);
-            txt.innerHTML = "<strong>" + (h.label || h.holiday) + "</strong> &mdash; " + (h.date ? fmtShort(h.date) : fmtShort(h.date)) + (h.when ? " <span class='sched-hol-when'>("+h.when+")</span>" : "");
-            hrow.appendChild(dot); hrow.appendChild(txt);
-            group.appendChild(hrow);
-          }
-          holGrid.appendChild(group);
-        }
-
-        addHolGroup("Sprint", sprintHols, "col-sprint");
-        addHolGroup("Regression", regHols, "col-reg");
-        addHolGroup("Release window", releaseHols, "col-release");
-
-        holStrip.appendChild(holGrid);
-        panel.appendChild(holStrip);
+        holExpGrid.appendChild(makeHolCol("Sprint", sprintHols));
+        holExpGrid.appendChild(makeHolCol("Regression", regHols));
+        holExpGrid.appendChild(makeHolCol("Release window", relHols));
+        holSec.appendChild(holExpGrid);
+        expandPanel.appendChild(holSec);
       }
 
-      card.appendChild(top); card.appendChild(panel);
+      // Click chevron OR name to toggle expand
+      var toggleExpansion=function() {
+        expandPanel.classList.toggle("open");
+        chevBtn.classList.toggle("open");
+      };
+      chevBtn.onclick=function(e){ e.stopPropagation(); toggleExpansion(); };
+      nameEl.onclick=function(e){ e.stopPropagation(); toggleExpansion(); };
+
+      card.appendChild(expandPanel);
+
+      // Keep top variable for drag compatibility
+      var top = nameRow;
 
       // Drag events
       card.setAttribute("draggable","true");
@@ -1859,7 +2068,6 @@ function renderHistory() {
       });
 
       grid.appendChild(card);
-    })(sp);
   } // end buildSprintCard
 
   // Render sections in order: Active → Upcoming → Previous → Archive
@@ -1946,8 +2154,11 @@ function toggleExpand(row, sp) {
   }
 }
 
+var _relSelectedYear = null;
+
 function renderReleases() {
-  var body=el("releaseBody"), empty=el("releaseEmpty"), count=el("releaseCount");
+  var body=el("releaseBody"), empty=el("releaseEmpty");
+  var yearNav=el("relYearNav");
   if(!body) return;
   dbLoadSprints(function(sprints) {
   sprints = sprints.map(function(s){ return {
@@ -1957,83 +2168,118 @@ function renderReleases() {
     regEnd: s.reg_end, euRelease: s.eu_release, naRelease: s.na_release,
     sd: s.sd, fd: s.fd, rd: s.rd, published: s.published
   };});
-  // Only show published sprints that have eu/na release dates
   sprints = sprints.filter(function(s){ return s.published && s.euRelease && s.naRelease; });
-  if(count) count.textContent=sprints.length+" release"+(sprints.length!==1?"s":"");
   if(sprints.length===0){ if(empty)empty.style.display="block"; return; }
   if(empty) empty.style.display="none";
-  var today2=new Date(); today2.setHours(0,0,0,0);
-  // Follow same custom drag order as sprint schedule
-  var relSavedOrder = loadSprintOrder();
-  var relIdMap = {};
-  sprints.forEach(function(s){ relIdMap[s.id]=s; });
-  var relOrdered = [];
-  relSavedOrder.forEach(function(id){ if(relIdMap[id]){ relOrdered.push(relIdMap[id]); delete relIdMap[id]; } });
-  sprints.forEach(function(s){ if(relIdMap[s.id]) relOrdered.push(s); });
-  var sorted = relOrdered;
-  body.innerHTML="";
-  if(empty){ empty.style.display="none"; body.appendChild(empty); }
 
-  var grid=document.createElement("div"); grid.className="release-grid";
-
-  // Group by active/upcoming vs past
-  var groupActive=[], groupUpcoming=[], groupPast=[];
+  // Group by year based on EU release date
+  var yearGroups={}, yearOrder=[];
   var today0=new Date(); today0.setHours(0,0,0,0);
-  sorted.forEach(function(sp){
+  sprints.forEach(function(sp){
+    var y = sp.euRelease ? sp.euRelease.substring(0,4) : "Unknown";
+    if(!yearGroups[y]){ yearGroups[y]=[]; yearOrder.push(y); }
+    yearGroups[y].push(sp);
+  });
+  // Sort years descending, current/upcoming first
+  yearOrder.sort(function(a,b){ return a > b ? 1 : -1; });
+
+  // Auto-select year containing active sprint, else first year
+  if(!_relSelectedYear || !yearGroups[_relSelectedYear]) {
+    var activeYear = null;
+    yearOrder.forEach(function(y){
+      yearGroups[y].forEach(function(sp){
+        var spStart=parseLocal(sp.sprintStart), spEnd=parseLocal(sp.sprintEnd);
+        var eu0=parseLocal(sp.euRelease); if(spStart<=today0 && eu0>=today0) activeYear = y;
+      });
+    });
+    _relSelectedYear = activeYear || yearOrder[0];
+  }
+
+  // Build year nav
+  if(yearNav) {
+    yearNav.innerHTML = "";
+    yearOrder.forEach(function(y, i) {
+      if(i > 0) {
+        var sep = document.createElement("div"); sep.className = "rel-year-sep"; yearNav.appendChild(sep);
+      }
+      var item = document.createElement("div"); item.className = "rel-year-item" + (y === _relSelectedYear ? " active" : "");
+      var lbl = document.createElement("span"); lbl.className = "rel-year-lbl"; lbl.textContent = y;
+      var dot = document.createElement("span"); dot.className = "rel-year-dot";
+      item.appendChild(lbl); item.appendChild(dot);
+      item.onclick = (function(yr){ return function(){
+        _relSelectedYear = yr;
+        renderReleases();
+      }; })(y);
+      yearNav.appendChild(item);
+    });
+  }
+
+  // Render content for selected year
+  var selectedSprints = yearGroups[_relSelectedYear] || [];
+  var groupActive=[], groupUpcoming=[], groupPast=[];
+  selectedSprints.forEach(function(sp){
     var eu=parseLocal(sp.euRelease);
     var spStart=parseLocal(sp.sprintStart), spEnd=parseLocal(sp.sprintEnd);
     if(eu < today0) groupPast.push(sp);
-    else if(spStart<=today0 && today0<=spEnd) groupActive.push(sp);
+    else if(spStart<=today0 && eu>=today0) groupActive.push(sp);
     else groupUpcoming.push(sp);
   });
-
-  // Sort past newest first
   groupPast.sort(function(a,b){ return (b.euRelease||"") > (a.euRelease||"") ? 1 : -1; });
 
-  // Archive state
   if(window._releaseArchiveExpanded === undefined) window._releaseArchiveExpanded = false;
+
+  body.innerHTML = "";
+
+  // Year heading
+  var heading = document.createElement("div"); heading.className = "rel-year-heading"; heading.textContent = _relSelectedYear + " Releases";
+  body.appendChild(heading);
+
+  var grid=document.createElement("div"); grid.className="release-grid";
 
   function makeDividerR(label) {
     var d=document.createElement("div");
     d.style.cssText="display:flex;align-items:center;gap:10px;margin:14px 0 10px;";
-    var lbl=document.createElement("span");
-    lbl.style.cssText="font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap;";
-    lbl.textContent=label;
-    var line=document.createElement("span");
-    line.style.cssText="flex:1;height:1px;background:var(--border);";
-    d.appendChild(lbl); d.appendChild(line);
+    var badge=document.createElement("span");
+    badge.style.cssText="font-size:10px;font-weight:700;color:#6b8578;background:#e8f0eb;padding:2px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;";
+    badge.textContent=label;
+    var line=document.createElement("span"); line.style.cssText="flex:1;height:1px;background:#dce8e1;";
+    d.appendChild(badge); d.appendChild(line);
     return d;
   }
 
-  // Render Active
   if(groupActive.length > 0){
     grid.appendChild(makeDividerR("Active"));
     groupActive.forEach(function(sp){ buildCard(sp, grid); });
   }
-
-  // Render Upcoming
   if(groupUpcoming.length > 0){
     grid.appendChild(makeDividerR("Upcoming"));
     groupUpcoming.forEach(function(sp){ buildCard(sp, grid); });
   }
-
-  // No upcoming message
-  if(groupActive.length === 0 && groupUpcoming.length === 0){
+  if(groupActive.length === 0 && groupUpcoming.length === 0 && groupPast.length === 0){
     var emptyMsg=document.createElement("div"); emptyMsg.className="history-empty";
-    emptyMsg.textContent="No upcoming releases.";
+    emptyMsg.textContent="No releases for "+_relSelectedYear+".";
     grid.appendChild(emptyMsg);
   }
 
-  // Archive button + past releases
+  // Archive
   if(groupPast.length > 0){
-    var relArchiveBtn=document.createElement("button");
-    relArchiveBtn.className="archive-toggle-btn";
-    relArchiveBtn.innerHTML=(window._releaseArchiveExpanded ? "&#9650; Hide archive" : "&#128193; Archive (" + groupPast.length + " past release" + (groupPast.length!==1?"s":"") + ")");
-    relArchiveBtn.onclick=function(){
-      window._releaseArchiveExpanded=!window._releaseArchiveExpanded;
+    var archiveDiv = document.createElement("div"); archiveDiv.className = "rel-new-archive";
+    archiveDiv.onclick = function(){
+      window._releaseArchiveExpanded = !window._releaseArchiveExpanded;
       renderReleases();
     };
-    grid.appendChild(relArchiveBtn);
+    var archLeft = document.createElement("div"); archLeft.className = "rel-archive-left";
+    var archIcon = document.createElement("div"); archIcon.className = "rel-archive-icon"; archIcon.textContent = "📁";
+    var archText = document.createElement("div");
+    var archTitle = document.createElement("div"); archTitle.className = "rel-archive-title"; archTitle.textContent = "Archive";
+    var archSub = document.createElement("div"); archSub.className = "rel-archive-sub";
+    archSub.textContent = groupPast.length + " past release" + (groupPast.length!==1?"s":"");
+    archText.appendChild(archTitle); archText.appendChild(archSub);
+    archLeft.appendChild(archIcon); archLeft.appendChild(archText);
+    var archArr = document.createElement("span"); archArr.style.cssText = "color:#9ab8a6;font-size:14px;transition:transform 0.2s;";
+    archArr.textContent = window._releaseArchiveExpanded ? "▾" : "›";
+    archiveDiv.appendChild(archLeft); archiveDiv.appendChild(archArr);
+    grid.appendChild(archiveDiv);
 
     if(window._releaseArchiveExpanded){
       grid.appendChild(makeDividerR("Archive"));
@@ -2050,7 +2296,7 @@ function renderReleases() {
       var isPast = eu < today;
       var statusLabel, statusCls;
       if(isPast){ statusLabel="Released"; statusCls="status-past"; }
-      else if(spStart<=today && today<=spEnd){ statusLabel="Active sprint"; statusCls="status-active"; }
+      else if(spStart<=today && eu>=today){ statusLabel="Active sprint"; statusCls="status-active"; }
       else { statusLabel="Upcoming"; statusCls="status-upcoming"; }
 
       var diff=Math.round((eu-today)/(1000*60*60*24));
@@ -2062,7 +2308,121 @@ function renderReleases() {
       function fmtDay(d){ return d.toLocaleDateString("en-US",{weekday:"long"}); }
       function fmtDateBig(d){ return d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
 
-      var card=document.createElement("div"); card.className="release-card";
+      // ── NEW CARD DESIGN ──
+      var card=document.createElement("div");
+      card.className="rel-card-new" + (statusCls==="status-active" ? " active-card" : statusCls==="status-past" ? " past-card" : "");
+
+      // Top — name + status badge
+      var topDiv=document.createElement("div"); topDiv.className="rel-card-top";
+      var topLeft=document.createElement("div");
+      var nameRow=document.createElement("div"); nameRow.className="rel-card-name";
+      var nameText=document.createElement("span"); nameText.textContent=sp.name;
+      var detailBtn=document.createElement("button"); detailBtn.className="release-detail-btn"; detailBtn.title="View sprint details"; detailBtn.innerHTML="i";
+      detailBtn.onclick=(function(s){ return function(e){ e.stopPropagation(); openSprintDetailModal(s); }; })(sp);
+      nameRow.appendChild(nameText); nameRow.appendChild(detailBtn);
+      var subRow=document.createElement("div"); subRow.className="rel-card-sub";
+      subRow.textContent=fmtMini(spStart)+" → "+fmtMini(spEnd)+" · "+(sp.sd||"")+"d sprint";
+      topLeft.appendChild(nameRow); topLeft.appendChild(subRow);
+      var statusBadge=document.createElement("span"); statusBadge.className="release-card-status "+statusCls; statusBadge.textContent=statusLabel;
+      topDiv.appendChild(topLeft); topDiv.appendChild(statusBadge);
+      card.appendChild(topDiv);
+
+      // Dates row
+      var datesDiv=document.createElement("div"); datesDiv.className="rel-card-dates";
+      var euCol=document.createElement("div"); euCol.className="rel-date-col";
+      euCol.innerHTML='<div class="rel-date-region">🇪🇺 EU Release</div><div class="rel-date-wday">'+fmtDay(eu)+'</div><div class="rel-date-val'+(isPast?" past":"")+'">'+fmtDateBig(eu)+'</div>';
+      var naCol=document.createElement("div"); naCol.className="rel-date-col";
+      naCol.innerHTML='<div class="rel-date-region">🇺🇸 NA Release</div><div class="rel-date-wday">'+fmtDay(na)+'</div><div class="rel-date-val'+(isPast?" past":" na")+'">'+fmtDateBig(na)+'</div>';
+      datesDiv.appendChild(euCol); datesDiv.appendChild(naCol);
+      card.appendChild(datesDiv);
+
+      // Holiday alerts check
+      function getMonday(d, direction) {
+        var result = new Date(d); var day = result.getDay();
+        if(direction === "before"){ var diff2 = day === 0 ? 6 : day - 1; result.setDate(result.getDate() - diff2); }
+        else { var diff3 = day === 0 ? 1 : 8 - day; result.setDate(result.getDate() + diff3); }
+        return result;
+      }
+      var mondayBefore = getMonday(eu, "before");
+      var mondayAfter  = getMonday(na, "after");
+      var alertDates = [
+        { date: eu, label: "EU release day" }, { date: na, label: "NA release day" },
+        { date: mondayBefore, label: "Monday before EU release" }, { date: mondayAfter, label: "Monday after NA release" }
+      ];
+      var releaseAlerts = [];
+      for(var ai=0; ai<alertDates.length; ai++) {
+        var ad = alertDates[ai];
+        var adISO = ad.date.getFullYear()+"-"+pad(ad.date.getMonth()+1)+"-"+pad(ad.date.getDate());
+        for(var hi2=0; hi2<holidays.length; hi2++) {
+          if(holidays[hi2].date === adISO) {
+            releaseAlerts.push({ when: ad.label, holiday: holidays[hi2].label, date: ad.date });
+          }
+        }
+      }
+
+      // Footer
+      var ftr=document.createElement("div"); ftr.className="rel-card-ftr";
+      var daysEl=document.createElement("div"); daysEl.className="rel-countdown";
+      if(!isPast && diff > 0) { daysEl.innerHTML="<strong>"+diff+"</strong> days until EU release"; }
+      else { daysEl.textContent=daysAway; }
+      ftr.appendChild(daysEl);
+
+      // Actions
+      var actDiv=document.createElement("div"); actDiv.className="rel-card-actions";
+
+      // Holiday warning icon if conflicts exist
+      if(releaseAlerts.length > 0) {
+        var holTip=document.createElement("span"); holTip.className="release-hol-tip"; holTip.setAttribute("tabindex","0");
+        holTip.style.marginLeft="auto";
+        var tipIcon=document.createElement("span"); tipIcon.className="release-hol-icon"; tipIcon.innerHTML="&#9888;";
+        var tipBox=document.createElement("div"); tipBox.className="release-hol-tipbox";
+        var tipTitle=document.createElement("div"); tipTitle.className="release-hol-tipbox-title"; tipTitle.textContent="Holiday conflicts";
+        tipBox.appendChild(tipTitle);
+        for(var ri=0; ri<releaseAlerts.length; ri++) {
+          var al=releaseAlerts[ri]; var tipRow=document.createElement("div"); tipRow.className="release-hol-tipbox-row";
+          tipRow.innerHTML="<strong>"+al.holiday+"</strong> — "+fmtDateBig(al.date)+" <em style='color:#9ca3af;'>("+al.when+")</em>";
+          tipBox.appendChild(tipRow);
+        }
+        holTip.appendChild(tipIcon); holTip.appendChild(tipBox);
+        actDiv.appendChild(holTip);
+      }
+
+      // Save dropdown
+      var dropWrap=document.createElement("div"); dropWrap.className="save-dropdown-wrap";
+      var dropTrigger=document.createElement("button"); dropTrigger.className="save-dropdown-trigger rel-act-btn"; dropTrigger.title="Save options";
+      dropTrigger.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+      var dropMenu=document.createElement("div"); dropMenu.className="save-dropdown-menu";
+      var itemText=document.createElement("button"); itemText.className="save-dropdown-item";
+      itemText.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Save as Text';
+      itemText.onclick=(function(spName, euD, naD){ return function(e){
+        e.stopPropagation(); dropMenu.classList.remove("open"); dropTrigger.classList.remove("open");
+        var fmtD=function(d){ return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); };
+        var txt=spName+"\n----------------------------\nEU Release:  "+fmtD(euD)+"\nNA Release:  "+fmtD(naD);
+        navigator.clipboard.writeText(txt).catch(function(){});
+        var blob=new Blob([txt],{type:"text/plain"}); var url2=URL.createObjectURL(blob);
+        var a=document.createElement("a"); a.href=url2; a.download=spName.replace(/[^a-z0-9]/gi,"_")+"_release_dates.txt";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url2);
+        showToast("Saved & copied!");
+      }; })(sp.name, eu, na);
+      var itemImg=document.createElement("button"); itemImg.className="save-dropdown-item";
+      itemImg.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy as Image';
+      itemImg.onclick=(function(cardEl2, spName){ return function(e){ e.stopPropagation(); dropMenu.classList.remove("open"); dropTrigger.classList.remove("open"); copyCardAsImage(cardEl2, spName, itemImg); }; })(card, sp.name);
+      dropMenu.appendChild(itemText); dropMenu.appendChild(itemImg);
+      dropTrigger.onclick=(function(menu, trigger){ return function(e){
+        e.stopPropagation();
+        var isOpen=menu.classList.contains("open");
+        document.querySelectorAll(".save-dropdown-menu.open").forEach(function(m){ m.classList.remove("open"); });
+        document.querySelectorAll(".save-dropdown-trigger.open").forEach(function(t){ t.classList.remove("open"); });
+        if(!isOpen){ menu.classList.add("open"); trigger.classList.add("open"); }
+      }; })(dropMenu, dropTrigger);
+      dropWrap.appendChild(dropMenu); dropWrap.appendChild(dropTrigger);
+      actDiv.appendChild(dropWrap);
+      ftr.appendChild(actDiv);
+      card.appendChild(ftr);
+      grid.appendChild(card);
+
+      // Keep old card var for image copy compat — point to new card
+      var oldCard = card;
 
       // Header
       var hdr=document.createElement("div"); hdr.className="release-card-header";
@@ -2127,104 +2487,6 @@ function renderReleases() {
         }
       }
 
-      // Footer
-      var ftr=document.createElement("div"); ftr.className="release-card-footer";
-
-      card.appendChild(hdr); card.appendChild(bdy);
-
-      var daysEl=document.createElement("span"); daysEl.className="release-days-away"; daysEl.textContent=daysAway;
-
-      // Build warning tooltip for footer (next to save button) if there are holiday conflicts
-      var holTip = null;
-      if(releaseAlerts.length > 0) {
-        holTip = document.createElement("span");
-        holTip.className = "release-hol-tip";
-        holTip.setAttribute("tabindex","0");
-        holTip.style.marginLeft = "auto";
-        var tipIcon = document.createElement("span");
-        tipIcon.className = "release-hol-icon";
-        tipIcon.innerHTML = "&#9888;";
-        var tipBox = document.createElement("div");
-        tipBox.className = "release-hol-tipbox";
-        var tipTitle = document.createElement("div");
-        tipTitle.className = "release-hol-tipbox-title";
-        tipTitle.textContent = "Holiday conflicts";
-        tipBox.appendChild(tipTitle);
-        for(var ri=0; ri<releaseAlerts.length; ri++) {
-          var al = releaseAlerts[ri];
-          var tipRow = document.createElement("div");
-          tipRow.className = "release-hol-tipbox-row";
-          tipRow.innerHTML = "<strong>"+al.holiday+"</strong> — "+fmtDateBig(al.date)+" <em style='color:#9ca3af;'>("+al.when+")</em>";
-          tipBox.appendChild(tipRow);
-        }
-        holTip.appendChild(tipIcon);
-        holTip.appendChild(tipBox);
-      }
-      var sendBtn=document.createElement("button"); sendBtn.className="release-send-btn";
-      sendBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg> Send to Slack';
-      sendBtn.onclick=(function(id){ return function(){ openSlackModal(id); }; })(sp.id);
-
-      // ── Single save dropdown (replaces 3 separate buttons) ──
-      var dropWrap = document.createElement("div"); dropWrap.className = "save-dropdown-wrap";
-      var dropTrigger = document.createElement("button"); dropTrigger.className = "save-dropdown-trigger"; dropTrigger.title = "Save options";
-      dropTrigger.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-      var dropMenu = document.createElement("div"); dropMenu.className = "save-dropdown-menu";
-
-      // Save as Text option
-      var itemText = document.createElement("button"); itemText.className = "save-dropdown-item";
-      itemText.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Save as Text';
-      itemText.onclick = (function(spName, euD, naD){ return function(e){
-        e.stopPropagation();
-        dropMenu.classList.remove("open"); dropTrigger.classList.remove("open");
-        var fmtD = function(d){ return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); };
-        var txt = spName + "\n----------------------------\nEU Release:  " + fmtD(euD) + "\nNA Release:  " + fmtD(naD);
-        // Copy to clipboard
-        navigator.clipboard.writeText(txt).catch(function(){});
-        // Also trigger download so user can save wherever they want
-        var blob = new Blob([txt], {type: "text/plain"});
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = spName.replace(/[^a-z0-9]/gi,"_") + "_release_dates.txt";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast("Saved & copied to clipboard!");
-      }; })(sp.name, eu, na);
-
-      // Copy as Image option
-      var itemImg = document.createElement("button"); itemImg.className = "save-dropdown-item";
-      itemImg.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy as Image';
-      itemImg.onclick = (function(cardEl, spName){ return function(e){
-        e.stopPropagation();
-        dropMenu.classList.remove("open"); dropTrigger.classList.remove("open");
-        copyCardAsImage(cardEl, spName, itemImg);
-      }; })(card, sp.name);
-
-      dropMenu.appendChild(itemText); dropMenu.appendChild(itemImg);
-
-      // Toggle dropdown on trigger click
-      dropTrigger.onclick = (function(menu, trigger){ return function(e){
-        e.stopPropagation();
-        var isOpen = menu.classList.contains("open");
-        // Close all other open dropdowns first
-        document.querySelectorAll(".save-dropdown-menu.open").forEach(function(m){ m.classList.remove("open"); });
-        document.querySelectorAll(".save-dropdown-trigger.open").forEach(function(t){ t.classList.remove("open"); });
-        if(!isOpen){ menu.classList.add("open"); trigger.classList.add("open"); }
-      }; })(dropMenu, dropTrigger);
-
-      dropWrap.appendChild(dropMenu); dropWrap.appendChild(dropTrigger);
-
-      // Assemble footer: days away | [spacer] | [⚠ if conflict] [⬇ save dropdown] | [slack]
-      var footerRight = document.createElement("div");
-      footerRight.style.cssText = "display:flex;align-items:center;gap:6px;margin-left:auto;";
-      if(holTip) footerRight.appendChild(holTip);
-      footerRight.appendChild(dropWrap);
-      footerRight.appendChild(sendBtn);
-      ftr.appendChild(daysEl); ftr.appendChild(footerRight);
-      card.appendChild(ftr);
-      grid.appendChild(card);
     })(sp);
   } // end buildCard
 
