@@ -451,7 +451,7 @@
     .sprint-entry.status-active { border: 2px solid #1a6b3c; }
     .sprint-entry.status-past { opacity: 0.85; }
     /* Name row */
-    .scard-name-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; gap: 10px; }
+    .scard-name-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 0; gap: 4px; }
     .scard-name { font-size: 16px; font-weight: 800; color: #0d2618; cursor: pointer; position: relative; display: inline-block; }
     .scard-name:hover { color: #1a6b3c; text-decoration: underline; text-decoration-color: #c8ddd2; text-underline-offset: 3px; }
     /* Hover tooltip */
@@ -464,9 +464,10 @@
     .scard-tooltip-val { font-weight: 600; color: #fff; }
     .scard-tooltip-hol { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #fcd34d; }
     /* Expand panel */
-    /* Chevron toggle button */
-    .scard-chevron { width: 26px; height: 26px; border-radius: 50%; border: 1px solid #c8ddd2; background: #f4f7f5; color: #6b8578; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
-    .scard-chevron.open { background: #1a6b3c; border-color: #1a6b3c; color: #fff; transform: rotate(180deg); }
+    /* Chevron toggle button — darker, highlighted when open */
+    .scard-chevron { width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid #9ab8a6; background: #f0faf4; color: #1a6b3c; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; flex-shrink: 0; margin-right: 6px; }
+    .scard-chevron:hover { background: #1a6b3c; color: #fff; border-color: #1a6b3c; }
+    .scard-chevron.open { background: #1a6b3c; border-color: #1a6b3c; color: #fff; }
     /* Expand panel */
     .scard-expand { display: none; border-top: 2px solid #e0ebe4; background: #f8fbf9; }
     .scard-expand.open { display: block; }
@@ -524,11 +525,11 @@
     .archive-toggle-btn:hover { background: var(--paper); color: var(--ink2); }
 
     /* ── Publish button & draft badge ── */
-    .publish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1.5px solid var(--reg-ink); border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-    .publish-btn:hover { background: var(--reg-ink); color: #fff; }
+    .publish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; font-family: 'Inter',sans-serif; font-size: 11px; font-weight: 600; color: #1a6b3c; background: #f0faf4; border: 1.5px solid #1a6b3c; border-radius: 20px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .publish-btn:hover { background: #1a6b3c; color: #fff; }
     .draft-badge { display: inline-flex; align-items: center; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; letter-spacing: 0.04em; }
     .published-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--reg-ink); background: var(--reg-bg); border: 1px solid var(--reg-ink); border-radius: 6px; letter-spacing: 0.04em; }
-    .unpublish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .unpublish-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; font-family: 'Inter',sans-serif; font-size: 11px; font-weight: 600; color: #92400e; background: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 20px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .unpublish-btn:hover { background: #f59e0b; color: #fff; }
 
     /* ── Save dropdown on release cards ── */
@@ -1934,7 +1935,7 @@ function renderHistory() {
               unpublishSprint(sid, ub);
             }; })(sp.id, unpubBtn);
             pubLeft.appendChild(pubBadge2);
-            pubRight.appendChild(unpubBtn);
+            pubLeft.appendChild(unpubBtn);
           } else {
             var draftBadge = document.createElement("span");
             draftBadge.className = "draft-badge"; draftBadge.textContent = "Draft";
@@ -1947,7 +1948,7 @@ function renderHistory() {
               publishSprint(sid, pb);
             }; })(sp.id, pubBtn);
             pubLeft.appendChild(draftBadge);
-            pubRight.appendChild(pubBtn);
+            pubLeft.appendChild(pubBtn);
           }
         }
         // Delete
